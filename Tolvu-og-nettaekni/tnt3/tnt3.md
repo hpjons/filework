@@ -1,0 +1,1647 @@
+---
+title: "Tölvu- og nettækni"
+course: "TNT3"
+subtitle: "Kennsluhefti"
+author: "Eiríkur Guðmundsson"
+edition: "Útgáfa B2"
+cover: "myndir/forsida.png"
+lang: is
+toc: true
+---
+
+> Þetta hefti er án endurgjalds á rafbókinni [www.rafbok.is](https://www.rafbok.is). Allir rafiðnaðarmenn og rafiðnaðarnemar geta fengið aðgang að rafbókinni án endurgjalds.
+>
+> Heimilt er að afrita textann til fræðslu í skólum sem reknir eru fyrir opinbert fé án leyfis höfundar eða Rafmenntar, fræðsluseturs rafiðnaðarins. Hvers konar sala á textanum í heild eða að hluta til er óheimil nema að fengnu leyfi höfundar og Rafmenntar.
+>
+> Vinsamlegast sendið leiðréttingar og athugasemdir til höfundar eða til Báru Laxdal Halldórsdóttur á netfangið <bara@rafmennt.is>.
+>
+> Höfundur er Eiríkur Guðmundsson. Umbrot: Bára Laxdal Halldórsdóttir.
+
+## 1. TTL- og CMOS-rásir og tengingar við rofa og aflstýringar
+
+### 1.1 TTL-rásir
+
+TTL-rásir (*Transistor Transistor Logic*) eru rökrásir þar sem nafnið byrjar á 54 eða 74. 74-rásirnar eru miklu algengari og við munum því einblína á þær. Þær heita TTL vegna þess að bæði rökræni hluti þeirra (AND, OR og NOT) og útgangsstig (mögnunarstig) þeirra eru búin til með transistorum. 54xxx-rásirnar virka eins og 74xxx-rásirnar en eru gerðar samkvæmt hernaðarstaðli (*military standard*) og vinna því betur við erfiðar aðstæður.
+
+Skoðum fyrst tæknilegar upplýsingar um 74xxx-rásirnar (þar sem xxx er tveggja eða þriggja stafa tala) og veljum eina, 7408, sem er með fjórum tveggja innganga AND-hliðum. Aðrar rásir í 74-röðinni hafa mjög svipuð gildi. Gagnablöðin (*data sheets*) má finna á netinu, t.d. með leitarorðunum „7408 data sheet“.
+
+**7408 QUAD DUAL INPUT AND GATE**
+
+*Absolute Maximum Ratings (Note 1)*
+
+| Parameter | Value |
+|:--|:--|
+| Supply Voltage | 7 V |
+| Input Voltage | 5.5 V |
+| Operating Free Air Temperature Range, DM54 and 54 | −55 °C to +125 °C |
+| Operating Free Air Temperature Range, DM74 | 0 °C to +70 °C |
+| Storage Temperature Range | −65 °C to +150 °C |
+
+*Recommended Operating Conditions*
+
+| Symbol | Parameter | DM5408 Min | Nom | Max | DM7408 Min | Nom | Max | Units |
+|:-:|:--|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| $V_{CC}$ | Supply Voltage | 4.5 | 5 | 5.5 | 4.75 | 5 | 5.25 | V |
+| $V_{IH}$ | High Level Input Voltage | 2 | | | 2 | | | V |
+| $V_{IL}$ | Low Level Input Voltage | | | 0.8 | | | 0.8 | V |
+| $I_{OH}$ | High Level Output Current | | | −0.8 | | | −0.8 | mA |
+| $I_{OL}$ | Low Level Output Current | | | 16 | | | 16 | mA |
+| $T_{A}$ | Free Air Operating Temperature | −55 | | 125 | 0 | | 70 | °C |
+
+*Note 1: The “Absolute Maximum Ratings” are those values beyond which the safety of the device cannot be guaranteed. The device should not be operated at these limits. The parametric values defined in the “Electrical Characteristics” table are not guaranteed at the absolute maximum ratings. The “Recommended Operating Conditions” table will define the conditions for actual device operation.*
+
+**Fæðispenna** (*supply voltage*, $V_{CC}$) er fæðispenna rásarinnar. Fyrir 74xxx-rásirnar á þessi spenna að vera á bilinu $4{,}75\,\mathrm{V}$ til $5{,}25\,\mathrm{V}$, helst sem næst $5\,\mathrm{V}$. Því er 7805-spennureglunarrásin mikið notuð með 74xxx-rásunum. Rásin virkar ekki nema hún fái fæðispennu.
+
+**Inngangsspenna.** Samkvæmt gagnablaðinu er $V_{IH}$ (*High Level Input Voltage*) $= 2\,\mathrm{V}$ (lágmark). Þetta þýðir að ef rásin á að vinna rétt verður inngangsspennan í hástöðu (rökleg 1) að vera $2\,\mathrm{V}$ eða hærri.
+
+$V_{IL}$ (*Low Level Input Voltage*) $= 0{,}8\,\mathrm{V}$ (hámark). Þetta þýðir að ef rásin á að vinna rétt verður inngangsspennan í lágstöðu (rökleg 0) að vera $0{,}8\,\mathrm{V}$ eða lægri.
+
+Sjáum að þarna á milli er bil frá $0{,}8\,\mathrm{V}$ til $2\,\mathrm{V}$, eins konar grátt svæði.
+
+### 1.2 Inngangsspenna
+
+![Mynd 1](myndir/mynd-1.png)
+
+*Mynd 1: Leyfileg inngangsspenna í lágstöðu og hástöðu og gráa svæðið á milli.*
+
+Við hönnun rökrásastýringa þarf að gæta þess að inngangsspennan lendi ekki inni á gráa svæðinu. Hún þarf að vera lægri en $0{,}8\,\mathrm{V}$ í lágstöðu og hærri en $2\,\mathrm{V}$ í hástöðu. Lendi hún á gráa svæðinu ábyrgjast framleiðendur ekki rétta virkni. T.d. væri $1{,}5\,\mathrm{V}$ rafhlaða ekki góð sem inngangsspenna inn á rökrás.
+
+*Electrical Characteristics – over recommended operating free air temperature range (unless otherwise noted)*
+
+| Symbol | Parameter | Conditions | Min | Typ (Note 2) | Max | Units |
+|:-:|:--|:--|:-:|:-:|:-:|:-:|
+| $V_{I}$ | Input Clamp Voltage | $V_{CC}$ = Min, $I_{I}$ = −12 mA | | | −1.5 | V |
+| $V_{OH}$ | High Level Output Voltage | $V_{CC}$ = Min, $I_{OH}$ = Max, $V_{IL}$ = Max | 2.4 | 3.4 | | V |
+| $V_{OL}$ | Low Level Output Voltage | $V_{CC}$ = Min, $I_{OL}$ = Max, $V_{IH}$ = Min | | 0.2 | 0.4 | V |
+| $I_{I}$ | Input Current @ Max Input Voltage | $V_{CC}$ = Max, $V_{I}$ = 5.5 V | | | 1 | mA |
+| $I_{IH}$ | High Level Input Current | $V_{CC}$ = Max, $V_{I}$ = 2.4 V | | | 40 | µA |
+| $I_{IL}$ | Low Level Input Current | $V_{CC}$ = Max, $V_{I}$ = 0.4 V | | | −1.6 | mA |
+| $I_{OS}$ | Short Circuit Output Current (Note 3) | $V_{CC}$ = Max, DM54 | −20 | | −55 | mA |
+| | | $V_{CC}$ = Max, DM74 | −18 | | −55 | mA |
+| $I_{CCH}$ | Supply Current with Output High | $V_{CC}$ = Max | | 11 | 21 | mA |
+| $I_{CCL}$ | Supply Current with Output Low | $V_{CC}$ = Max | | 20 | 33 | mA |
+
+*Switching Characteristics at $V_{CC}$ = 5 V and $T_{A}$ = 25 °C*
+
+| Symbol | Parameter | Conditions | Min | Max | Units |
+|:-:|:--|:--|:-:|:-:|:-:|
+| $t_{PLH}$ | Propagation Delay Time, Low to High Level Output | $C_{L}$ = 15 pF, $R_{L}$ = 400 Ω | | 27 | ns |
+| $t_{PHL}$ | Propagation Delay Time, High to Low Level Output | $C_{L}$ = 15 pF, $R_{L}$ = 400 Ω | | 19 | ns |
+
+*Note 2: All typicals are at $V_{CC}$ = 5 V, $T_{A}$ = 25 °C. Note 3: Not more than one output should be shorted at a time.*
+
+### 1.3 Inngangsstraumur
+
+Inngangsstraumur í hástöðu inngangs kallast $I_{IH}$ (*High Level Input Current*) og er gefinn $40\,\mu\mathrm{A}$ miðað við að $V_{CC}$ sé $5{,}25\,\mathrm{V}$ og inngangsspennan sé $2{,}4\,\mathrm{V}$.
+
+Inngangsstraumur í lágstöðu inngangs kallast $I_{IL}$ (*Low Level Input Current*) og er gefinn $-1{,}6\,\mathrm{mA}$ miðað við að $V_{CC}$ sé $5{,}25\,\mathrm{V}$ og inngangsspennan sé $0{,}4\,\mathrm{V}$.
+
+### 1.4 Útgangsspenna
+
+Útgangsspennan í **hástöðu** er kölluð $V_{OH}$ (*Voltage Output High*). Hún er gefin að lágmarki $2{,}4\,\mathrm{V}$ en er oftast (*typical*) $3{,}4\,\mathrm{V}$. Framleiðandinn ábyrgist sem sagt að við eðlilegar aðstæður sé útgangsspennan aldrei lægri en $2{,}4\,\mathrm{V}$ og venjulega $3{,}4\,\mathrm{V}$.
+
+Útgangsspennan í **lágstöðu** er kölluð $V_{OL}$ (*Voltage Output Low*). Hún er gefin að hámarki $0{,}4\,\mathrm{V}$ en er venjulega (*typical*) $0{,}2\,\mathrm{V}$. Framleiðandinn ábyrgist að við eðlilegar aðstæður sé þessi spenna oftast $0{,}2\,\mathrm{V}$ en geti farið upp í $0{,}4\,\mathrm{V}$. Sjáum að þessar stærðir lenda langt frá „gráa svæðinu“ og eru því vel nothæfar sem inngangsspenna inn á rásir sem á eftir koma. Við þurfum því ekki að hafa áhyggjur af útgangsspennunni ef við pössum upp á inngangsspennuna.
+
+![Mynd 2](myndir/mynd-2.png)
+
+*Mynd 2: Útgangsspenna 74xxx-rása, $V_{OH}$ og $V_{OL}$.*
+
+### 1.5 Útgangsstraumur
+
+Útgangsstraumurinn í **hástöðu** útgangs (rökleg 1) kallast $I_{OH}$ (*High Level Output Current*) og er gefinn $-0{,}8\,\mathrm{mA}$.
+
+Útgangsstraumurinn í **lágstöðu** útgangs (rökleg 0) kallast $I_{OL}$ (*Low Level Output Current*) og er gefinn $16\,\mathrm{mA}$.
+
+### 1.6 FAN OUT
+
+*Fan out* er stærð sem segir til um hve marga innganga einn útgangur á rökrás getur drifið. *Fan out* er skilgreint sem hlutfallið á milli útstraums og innstraums, bæði í hástöðu og lágstöðu:
+
+$$
+\text{Fan out} = \frac{I_{OH}}{I_{IH}} = \frac{0{,}8\,\mathrm{mA}}{40\,\mu\mathrm{A}} = 20
+\qquad\text{eða}\qquad
+\text{Fan out} = \frac{I_{OL}}{I_{IL}} = \frac{16\,\mathrm{mA}}{1{,}6\,\mathrm{mA}} = 10
+$$
+
+Veljum lægra gildið, sem er 10 og er fast gildi fyrir 74xxx-rásirnar. Einn útgangur á 74xxx-rás á því að ráða við að drífa 10 innganga sem koma á eftir honum.
+
+### 1.7 Seinkun (*propagation delay*)
+
+Seinkun í 74xxx-rásunum er mjög lítil, frá $19\,\mathrm{ns}$ (hámark) þegar útgangur breytist úr 1 í 0 upp í $27\,\mathrm{ns}$ (hámark) þegar útgangur breytist úr 0 í 1. Þetta eru tímar sem við þurfum yfirleitt ekki að hafa áhyggjur af og yfirleitt eru þeir miklu styttri en þetta. Nanósekúnda er milljarðasti hluti úr sekúndu og tíðni eins og t.d. $10\,\mathrm{MHz}$ ætti ekki að vera vandamál hvað seinkun varðar.
+
+![Mynd 3](myndir/mynd-3.png)
+
+*Mynd 3: Pinnamynd (pin out) af 7408-rásinni (4 × AND). Pinni 1 er yfirleitt merktur með punkti á rásinni. Ef vafi leikur á er hann efst til vinstri þegar hakið á rásinni snýr upp.*
+
+![Mynd 4](myndir/mynd-4.png)
+
+*Mynd 4: 7400-rásin (4 × NAND) með amerískum táknum fyrir NAND-hlið.*
+
+**Nánari merkingar 74-raðarinnar (Wikipedia)**
+
+| Röð | Lýsing |
+|:--|:--|
+| **74** | Upphaflega 74-rásin (10 mW, 10 ns) |
+| **74L** | *Low Power*, 1 mW, 33 ns |
+| **74H** | *High Speed*, 22 mW, 6 ns |
+| **74S** | *Schottky* (hraðvirk, Schottky-díóður), 19 mW, 3 ns |
+| **74LS** | *Low Power Schottky*, 2 mW, 9,5 ns |
+| **74AS** | *Advanced Schottky*, 8 mW, 1,7 ns |
+| **74ALS** | *Advanced Low Power Schottky*, 1,2 mW, 4 ns |
+| **74F** | *Fast*, 4 mW, 3 ns |
+
+### 1.8 CMOS-rásir
+
+CMOS-rásir þekkjast á því að nafn þeirra byrjar á 40 og venjulega er talað um CD4000-röðina. CMOS-rásirnar taka miklu minna afl en 74-röðin og hafa stærra *fan out*. Hver CMOS-útgangur getur þannig drifið fleiri innganga á eftir sér en 74-rásirnar. Þær eru hins vegar hægari en 74-rásirnar. Annar kostur við CMOS-rásirnar er að þær þola breiðara svið fæðispennu, $V_{DD}$, frá $3\,\mathrm{V}$ til $15\,\mathrm{V}$ (B-útgáfur allt að $18\,\mathrm{V}$). Þær eru hins vegar næmari fyrir stöðurafmagni (ESD) en 74-rásirnar og því þarf að meðhöndla þær varlega. CD4000-rásirnar eru minna notaðar í dag vegna framþróunar í 74-röðinni, sem nú inniheldur líka CMOS-rásir.
+
+**CMOS-raðir innan 74-fjölskyldunnar (Wikipedia)**
+
+| Röð | Lýsing |
+|:--|:--|
+| **74C** | CMOS 4–15 V operation similar to buffered 4000 (4000B) series. |
+| **74HC** | High-speed CMOS, similar performance to LS, 12 ns. 2.0–6.0 V. |
+| **74HCT** | High speed, compatible logic levels to bipolar parts. |
+| **74AC** | Advanced CMOS, performance generally between S and F. |
+| **74ACQ** | Advanced CMOS with Quiet outputs. |
+| **74AHC** | Advanced high-speed CMOS, three times as fast as HC. |
+| **74ALVC** | Low-voltage – 1.8–3.3 V, propagation delay (TPD) < 3 ns at 3.3 V. |
+| **74ALVT** | Low-voltage – 2.5–3.3 V, 5 V tolerant inputs, high current ≤ 64 mA, TPD < 3 ns at 2.5 V. |
+| **74AUC** | Low-voltage – 0.8–2.5 V, TPD < 2.5 ns at 1.8 V. |
+| **74AUP** | Low-voltage – 0.8–3.6 V (3.3 V typically), TPD 15.6/8.2/4.3 ns at 1.2/1.8/3.3 V, partial power-down specified (IOFF), inputs protected. |
+| **74AVC** | Low-voltage – 1.8–3.3 V, TPD < 3.2 ns at 1.8 V, bus hold, IOFF. |
+| **74FC** | Fast CMOS, performance similar to F. |
+| **74LCX** | CMOS with 3 V supply and 5 V tolerant inputs. |
+| **74LV** | Low-voltage CMOS – 2.0–5.5 V supply and 5 V tolerant inputs. |
+| **74LVC** | Low voltage – 1.65–3.3 V and 5 V tolerant inputs, TPD < 5.5 ns at 3.3 V, TPD < 9 ns at 2.5 V. |
+| **74LV-A** | 2.5–5 V, 5 V tolerant inputs, TPD < 10 ns at 3.3 V, bus hold, IOFF, low noise. |
+| **74LVT** | Low-voltage – 3.3 V supply, 5 V tolerant inputs, high output current < 64 mA, TPD < 3.5 ns at 3.3 V, IOFF, low noise. |
+| **74LVQ** | Low-voltage – 3.3 V. |
+| **74LVX** | Low-voltage – 3.3 V with 5 V tolerant inputs. |
+| **74VHC** | Very-high-speed CMOS. |
+
+*Dynamic Electrical Characteristics at $T_{A}$ = 25 °C, input $t_{r}$, $t_{f}$ = 20 ns, $C_{L}$ = 50 pF, $R_{L}$ = 200 kΩ (CD4000-teljari)*
+
+| Characteristic | $V_{DD}$ (V) | Min | Typ | Max | Units |
+|:--|:-:|:-:|:-:|:-:|:-:|
+| **Input-pulse operation** | | | | | |
+| Propagation Delay Time Φ to $Q_{1}$ Out; $t_{PHL}$, $t_{PLH}$ | 5 / 10 / 15 | – | 180 / 80 / 65 | 360 / 160 / 130 | ns |
+| $Q_{n}$ to $Q_{n+1}$; $t_{PHL}$, $t_{PLH}$ | 5 / 10 / 15 | – | 100 / 40 / 30 | 330 / 80 / 60 | ns |
+| Transition Time, $t_{THL}$, $t_{TLH}$ | 5 / 10 / 15 | – | 100 / 50 / 40 | 200 / 100 / 80 | ns |
+| Minimum Input-Pulse Width, $t_{W}$ | 5 / 10 / 15 | – | 70 / 30 / 20 | 140 / 60 / 40 | ns |
+| Input-Pulse Rise or Fall Time, $t_{r\Phi}$, $t_{f\Phi}$ | 5 / 10 / 15 | | Unlimited | | µs |
+| Maximum Input-Pulse Frequency, $f_{\Phi}$ | 5 / 10 / 15 | 3.5 / 8 / 12 | 7 / 16 / 24 | – | MHz |
+| Input Capacitance, $C_{I}$ | Any input | – | 5 | 7.5 | pF |
+| **Reset operation** | | | | | |
+| Propagation Delay Time, $t_{PHL}$ | 5 / 10 / 15 | – | 140 / 60 / 50 | 280 / 120 / 100 | ns |
+| Minimum Reset Pulse Width, $t_{W}$ | 5 / 10 / 15 | – | 100 / 40 / 30 | 200 / 80 / 60 | ns |
+| Reset Removal Time, $t_{REM}$ | 5 / 10 / 15 | – | 175 / 75 / 50 | 350 / 150 / 100 | ns |
+
+Gagnablað fyrir CD4000-rás. Gefnar eru upp stærðir miðað við $V_{DD} = 5\,\mathrm{V}$, $10\,\mathrm{V}$ og $15\,\mathrm{V}$. CD4000-rásirnar hafa því breytilega getu eftir því hver fæðispennan er.
+
+### 1.9 Afskoppunarrásir (*debouncing*)
+
+Almennt séð er ekki hægt að nota rofa beint á inngang rökrása. T.d. ef búa á til teljara þar sem á að hækka eða lækka gildið með rofa mun rofinn ekki senda einn púls heldur marga inn á teljarann. Ástæðan fyrir þessu er svokallað snertuskopp (*contact bouncing*). Venjuleg snerta nær ekki strax sambandi heldur skoppar hún vegna gormvirkni rofans. Ef við skoðum merki frá rofa í sveiflusjá lítur það einhvern veginn svona út:
+
+![Mynd 5](myndir/mynd-5.png)
+
+*Mynd 5: Merki frá rofa með snertuskoppi.*
+
+Merkið sem við viljum hins vegar fá lítur svona út:
+
+![Mynd 6](myndir/mynd-6.png)
+
+*Mynd 6: Hreinn púls.*
+
+Þessu má redda með svokallaðri afskoppunarrás (*debouncer*). Algeng leið til að gera þetta er að nota svokallaðan NAND-lás. Hann er búinn til úr tveimur tveggja innganga NAND-hliðum. Viðnámin á myndinni eru til að koma í veg fyrir að inngangarnir verði fljótandi (sambandslausir) þegar snertan er ekki tengd við þá. Sem dæmi heldur neðra $10\,\mathrm{k\Omega}$ viðnámið fastri $+5\,\mathrm{V}$ spennu á inngangi 5 miðað við þessa stöðu snertunnar. Ef snertan skiptir um stöðu mun hún á einhverjum tímapunkti lenda mitt á milli inngangs 1 og inngangs 5. Þá sjá viðnámin til þess að inngangar 1 og 5 hafi $+5\,\mathrm{V}$ spennu en verði ekki fljótandi. Um leið og snertan tengist við inngang 5 verður spennan á þeim inngangi $0\,\mathrm{V}$ en inngangur 1 verður fastur í $+5\,\mathrm{V}$.
+
+![Mynd 7](myndir/mynd-7.png)
+
+*Mynd 7: Afskoppunarrás með NAND-lás.*
+
+Ef við skoðum sannleikstöflu tveggja innganga NAND-hliðs skýrist virknin betur.
+
+| A | B | $Y = \overline{A\cdot B}$ |
+|:-:|:-:|:-:|
+| 0 | 0 | 1 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+Ef annar hvor eða báðir inngangar NAND-hliðs eru **0** er útgangurinn **1**. Útgangurinn er bara **0** þegar báðir inngangar eru **1**. Skoðum einn púls á rofanum, þ.e. þrýst er á hann og honum síðan sleppt.
+
+| ![Mynd 8](myndir/mynd-8.png) | ![Mynd 9](myndir/mynd-9.png) |
+|:-:|:-:|
+| Mynd 8: 1. Upphafsstaða. | Mynd 9: 2. Miðstaða snertu á leið niður. |
+| ![Mynd 10](myndir/mynd-10.png) | ![Mynd 11](myndir/mynd-11.png) |
+| Mynd 10: 3. Neðsta staða. | Mynd 11: 4. Miðstaða snertu á leið upp. |
+| ![Mynd 12](myndir/mynd-12.png) | $Q = 11001$ og $\overline{Q} = 00110$ frá stöðu 1 til stöðu 5. Sjáum hvernig Q-útgangarnir mynda hreinan púls. |
+| Mynd 12: 5. Upphafsstaða. | |
+
+![Mynd 13](myndir/mynd-13.png)
+
+*Mynd 13: Tvöfaldur NAND-lás með 7400 QUAD DUAL INPUT NAND GATE-rásinni.*
+
+![Mynd 14](myndir/mynd-14.png)
+
+*Mynd 14: Prent fyrir tvöfaldan NAND-lás.*
+
+![Mynd 15](myndir/mynd-15.png)
+
+*Mynd 15: Íhlutamynd fyrir tvöfaldan NAND-lás.*
+
+Önnur leið til að búa til hreina púlsa er að nota svokallaðan Schmitt-gikk (*Schmitt trigger*). Rásin 74HC14 inniheldur sex Schmitt-gikki með viðsnúnum (*inverted*) útgangi. Hana má því nota til að hreinsa púlsa frá sex snertum. Kosturinn við að nota Schmitt-gikk er að við þurfum ekki víxlsnertu (NC og NO) eins og í NAND-lásnum.
+
+![Mynd 16](myndir/mynd-16.png)
+
+*Mynd 16: 74HC14 HEX SCHMITT TRIGGER INVERTERS.*
+
+![Mynd 17](myndir/mynd-17.png)
+
+*Mynd 17: Afskoppunarrás sem notar eitt af sex hliðum 74HC14-rásarinnar.*
+
+![Mynd 18](myndir/mynd-18.png)
+
+*Mynd 18: Prentplata fyrir sexfalda Schmitt-gikks-afskoppunarrás.*
+
+![Mynd 19](myndir/mynd-19.png)
+
+*Mynd 19: Íhlutamynd fyrir sexfalda Schmitt-gikks-afskoppunarrás.*
+
+### 1.10 Samtenging hliða ef fleiri innganga er þörf (fjölgun innganga)
+
+Ef við þurfum fleiri innganga en í boði eru á einu hliði má tengja saman tvö eða fleiri hlið til að fjölga þeim. Hugsum okkur að við þurfum fjögurra innganga AND-hlið en eigum bara 7408-rásina sem er með fjórum tveggja innganga AND-hliðum.
+
+![Mynd 20](myndir/mynd-20.png)
+
+*Mynd 20: Fjögurra innganga AND-hlið búið til úr þremur tveggja innganga AND-hliðum.*
+
+Tengjum inngangana fjóra inn á tvö AND-hlið. Tökum útganga þeirra inn á þriðja AND-hliðið og þá höfum við fjögurra innganga AND-hlið búið til úr þremur tveggja innganga AND-hliðum. Það er auðvelt að sanna með Boole-algebru að þetta gefur sömu niðurstöðu og ef við værum með eitt fjögurra innganga AND-hlið.
+
+Sama gildir um OR-hlið. Við getum búið til fjögurra innganga OR-hlið úr þremur tveggja innganga OR-hliðum. 7432-rásin inniheldur fjögur tveggja innganga OR-hlið.
+
+![Mynd 21](myndir/mynd-21.png)
+
+*Mynd 21: Fjögurra innganga OR-hlið búið til úr þremur tveggja innganga OR-hliðum.*
+
+### 1.11 Verkefni 1
+
+Skoðið dæmið hér að framan. Gildir þetta líka um NAND og NOR? Það er best að sanna eða afsanna með því að búa til tengimynd og nota síðan Boole-algebru.
+
+### 1.12 Ónotaðir inngangar (fækkun innganga)
+
+Aldrei má skilja eftir ótengda innganga á rökrásum. Þá eru þeir það sem kallað er „fljótandi“ og óvíst hvort spennan á þeim er í lágstöðu eða hástöðu. Það þarf því að gera eitthvað við þessa innganga. Það eru tveir möguleikar í boði:
+
+1. Tengja ónotaða innganginn við næsta samliggjandi inngang.
+2. Tengja ónotaða innganginn við „hlutlausa“ stöðu.
+
+**Dæmi 1:** Okkur vantar tveggja innganga AND-hlið en höfum bara þriggja innganga. Tengjum neðsta innganginn við miðjuinnganginn. Þá er hliðið orðið tveggja innganga.
+
+![Mynd 22](myndir/mynd-22.png)
+
+*Mynd 22: $Y = A\cdot B\cdot B = A\cdot B$ samkvæmt Boole-algebru.*
+
+**Dæmi 2:** Okkur vantar tveggja innganga AND-hlið en höfum bara þriggja innganga. Tengjum neðsta innganginn í hástöðu (1, $5\,\mathrm{V}$) því 1 er hlutleysa margföldunar og AND-hliðið er margföldunarrás.
+
+![Mynd 23](myndir/mynd-23.png)
+
+*Mynd 23: $Y = A\cdot B\cdot 1 = A\cdot B$ samkvæmt Boole-algebru.*
+
+**Dæmi 3:** Okkur vantar tveggja innganga OR-hlið en höfum bara þriggja innganga. Tengjum neðsta innganginn við miðjuinnganginn. Þá er hliðið orðið tveggja innganga.
+
+![Mynd 24](myndir/mynd-24.png)
+
+*Mynd 24: $Y = A + B + B = A + B$ samkvæmt Boole-algebru.*
+
+**Dæmi 4:** Okkur vantar tveggja innganga OR-hlið en höfum bara þriggja innganga. Tengjum neðsta innganginn í lágstöðu (0, $0\,\mathrm{V}$) því 0 er hlutleysa samlagningar og OR-hliðið er samlagningarrás.
+
+![Mynd 25](myndir/mynd-25.png)
+
+*Mynd 25: $Y = A + B + 0 = A + B$ samkvæmt Boole-algebru.*
+
+### 1.13 Verkefni 2
+
+Gilda aðferðirnar í dæmum 1–4 líka fyrir NAND og NOR? Hver er hlutlausa staðan fyrir NAND og hver er hlutlausa staðan fyrir NOR?
+
+### 1.14 Útgangsmögnun
+
+Venjulegur útgangur á rökrás getur ekki drifið straumfreka innganga á eftir sér og því þurfum við að setja mögnunarstig á milli. Við getum í raun látið útgang á rökrás stýra hvaða álagi sem er með réttu mögnunarstigi eða -stigum.
+
+### 1.15 Transistorar
+
+Hugsum okkur að við viljum láta rökrásarútgang kveikja á $24\,\mathrm{V}$ DC segulliða. Það er ljóst að við tengjum segulliðann ekki beint á útganginn því hann hefur hvorki spennu né straumgetu til að drífa hann. En við getum t.d. sett transistor á milli, t.d. BD139 (eða Darlington-transistor ef þörf er á meiri straummögnun), og látið útganginn á rökrásinni stýra basa (*base*) transistorsins.
+
+![Mynd 26](myndir/mynd-26.png)
+
+*Mynd 26: Transistor sem mögnunarstig.*
+
+![Mynd 27](myndir/mynd-27.png)
+
+*Mynd 27: 7432 OR-hlið stýrir $24\,\mathrm{V}$ DC segulliða.*
+
+### 1.16 ULN2003
+
+![Mynd 28](myndir/mynd-28.png)
+
+*Mynd 28: ULN2003-rásin.*
+
+ULN2003-rásin er sjöfaldur Darlington-rekill (*driver*). Hún hefur sjö innganga og sjö útganga ásamt $V_{CC}$- og $0\,\mathrm{V}$-tengjum. $V_{CC}$ er fæðispenna hlutarins sem stýra á.
+
+![Mynd 29](myndir/mynd-29.png)
+
+*Mynd 29: AND- og OR-hlið stýra $24\,\mathrm{V}$ DC segulliðunum K1 og K2 í gegnum ULN2003.*
+
+Á myndinni stýra AND- og OR-hlið $24\,\mathrm{V}$ DC segulliðunum K1 og K2. Díóðurnar fyrir álagið eru innbyggðar í ULN2003-rásina og því þarf ekki að setja þær sérstaklega.
+
+ULN2003-rásin hentar sérstaklega vel til að stýra stórum sjö ráka LED-stöfum vegna fjölda útganga. Stafirnir eru þá tengdir með sameiginlegu skauti, CA (sameiginlegur +), og ULN2003-rásin sér um að tengja hverja rák við $0\,\mathrm{V}$ og kveikja þannig á henni.
+
+### 1.17 Ljóshlið (*optocoupler*)
+
+Ljóshlið aðskilur algerlega straumrás merkjagjafans og álagsins. Ljósdíóða í inngangsstigi ljóshliðsins sendir ljóspúls inn á basa transistors í útgangsstigi ljóshliðsins. Með þessu móti fer enginn straumur á milli inngangs og útgangs, bara ljós. Það eina sem útgangur rökrásarinnar þarf að gera er að kveikja á ljósdíóðu.
+
+![Mynd 30](myndir/mynd-30.png)
+
+*Mynd 30: 4N25-ljóshliðsrásin. Hún er með aukatengingu við basa transistorsins svo að hægt er að nota transistorinn í útganginum sjálfstætt. Annars er pinni 6 skilinn eftir ótengdur.*
+
+![Mynd 31](myndir/mynd-31.png)
+
+*Mynd 31: Tvö rökrásahlið stýra tveimur segulliðum, K1 og K2, í gegnum ljóshlið. Enginn straumur fer á milli rásanna.*
+
+## 2. Leit að bilunum í rökrásum með mælitækjum og hermiforritum
+
+### 2.1 Hermiforrit
+
+Það getur verið gott við hönnun rökrásastýringa að setja rásina upp í hermiforriti eins og Multisim eða Electronics Workbench. Þá er hægt að prófa rásina á tölvuskjá og skoða hvað gerist ef settar eru inn bilanir. Til þess að fá raunhæfar niðurstöður má samt ekki nota „hugsjónarásir“ (*ideal*). T.d. á ekki að vera leyfilegt að skilja eftir ótengdan inngang á rökrás.
+
+### 2.2 Sveiflusjár
+
+Til þess að leita að bilunum í raunverulegum rásum er algengast að nota stafrænar sveiflusjár eða svokallaðar prófur (*probes*).
+
+![Mynd 32](myndir/mynd-32.png)
+
+![Mynd 33](myndir/mynd-33.png)
+
+*Mynd 32 og 33: Uppsetning til kennslu og prófana á rökrásum.*
+
+Myndirnar hér að neðan sýna hvað við ættum að sjá á sveiflusjá ef hliðin eru í lagi.
+
+![Mynd 34](myndir/mynd-34.png)
+
+*Mynd 34: Það sem sést á sveiflusjá ef hliðin eru í lagi.*
+
+![Mynd 35](myndir/mynd-35.png)
+
+*Mynd 35: Mæling á OR-hliði 7432. Skjámynd af stafrænni sveiflusjá.*
+
+Sjáum að skjámyndinni ber saman við myndirnar tvær í þriðju röð á mynd 34. Annar inngangurinn er í upphafi festur í lágstöðu, sem er hlutlaus staða fyrir OR-hlið. Útgangurinn á þá að líta út eins og hinn inngangurinn ef rásin er í lagi.
+
+Hinn inngangurinn er tengdur við tíðnigjafa sem gefur út kassapúls, u.þ.b. $1\,\mathrm{kHz}$ (rauður ferill). Sjáum að útgangurinn hermir eftir innganginum eins og við vildum. Þegar inngangurinn sem var í lágstöðu er tengdur við hástöðu verður hann ráðandi og útgangurinn festist í hástöðu. Þetta hlið er því greinilega í lagi.
+
+### 2.3 Prófur
+
+Sveiflusjá er ekki alltaf tiltæk svo gott er að hafa eitthvert nettara bilanaleitartæki, t.d. prófu (*logic probe*).
+
+Til eru margar gerðir af prófum og við getum látið þær sýna okkur hvort tengipunktur er í hástöðu, lágstöðu, púlsandi eða fljótandi. Prófur er hægt að kaupa eða einfaldlega smíða sér sjálfur.
+
+![Mynd 36](myndir/mynd-36.png)
+
+*Mynd 36: Mynd af prófu. Svarta og rauða klemman fara á $0\,\mathrm{V}$ og $+5\,\mathrm{V}$. Pinninn er settur á þann punkt í rásinni sem mæla á.*
+
+![Mynd 37](myndir/mynd-37.png) ![Mynd 38](myndir/mynd-38.png)
+
+*Mynd 37 og 38: Prent af prófu sem auðvelt er að smíða og setja í kassa.*
+
+## 3. Lásar og vippur
+
+### 3.1 Lásar
+
+RS-lásinn er notaður til þess að geyma stöður. Hann virkar svipað og hin klassíska segulliðastýring með ræsingu, stöðvun og sjálfheldu. Ef S-inngangurinn fær púls fer Q-útgangurinn í 1 og helst þar, og ef R-inngangurinn fær púls fer Q-útgangurinn í 0 og helst þar. Stöðurnar læsast og þaðan kemur nafnið lásar.
+
+Til eru tvær grunngerðir af lásum. Það eru annars vegar NAND-lás og hins vegar NOR-lás.
+
+Á myndinni hér að neðan er NAND-lás, þ.e. hann er búinn til úr tveimur NAND-hliðum. Til þess að setja hann þarf að setja 0 á S-innganginn („active low“) og til þess að hreinsa hann þarf að setja 0 á R-innganginn. NAND-lásinn má ekki fá stöðuna $S = R = 0$. Þá fara báðir útgangar hans í stöðuna $Q = \overline{Q} = 1$ sem er bönnuð staða.
+
+![Mynd 39](myndir/mynd-39.png) ![Mynd 40](myndir/mynd-40.png)
+
+*Mynd 39 og 40: NAND-lás (til vinstri) og NOR-lás (til hægri).*
+
+NOR-lásinn er hins vegar settur og hreinsaður með 1 („active high“ inngangar). NOR-lásinn má ekki fá stöðuna $S = R = 1$. Þá fara báðir útgangar hans í stöðuna $Q = \overline{Q} = 0$ sem er bönnuð staða.
+
+### 3.2 Sannleikstöflur
+
+**RS-NAND-lás**
+
+| S | R | Q | $\overline{Q}$ |
+|:-:|:-:|:-:|:-:|
+| 0 | 0 | 1 | 1 (bannað) |
+| 0 | 1 | 1 | 0 |
+| 1 | 0 | 0 | 1 |
+| 1 | 1 | óbreytt (*hold*) | óbreytt (*hold*) |
+
+**RS-NOR-lás**
+
+| S | R | Q | $\overline{Q}$ |
+|:-:|:-:|:-:|:-:|
+| 0 | 0 | óbreytt (*hold*) | óbreytt (*hold*) |
+| 0 | 1 | 0 | 1 |
+| 1 | 0 | 1 | 0 |
+| 1 | 1 | 0 | 0 (bannað) |
+
+### 3.3 NOR- og NAND-lás í Electronics Workbench
+
+| ![Mynd 41](myndir/mynd-41.png) | ![Mynd 42](myndir/mynd-42.png) |
+|:-:|:-:|
+| Mynd 41: $S = 0$, $R = 0$ | Mynd 42: $S = 0$, $R = 1$ |
+| ![Mynd 43](myndir/mynd-43.png) | ![Mynd 44](myndir/mynd-44.png) |
+| Mynd 43: $S = 1$, $R = 0$ | Mynd 44: $S = 1$, $R = 1$ |
+
+RS-lás hefur táknið:
+
+![Mynd 45](myndir/mynd-45.png)
+
+*Mynd 45: Tákn RS-láss.*
+
+### 3.4 RS-vippur
+
+Vippur eru klukkustýrðar. Það þýðir að það er ekki nóg að breyta inngöngum þeirra til þess að fá breytingu á útgangi, eins og á lásum og venjulegum rökrásum, heldur verða þær líka að fá klukkupúls. Þetta kallast samfasa rásir (*synchronous*). Vippur þekkjast á því að þær hafa klukkuinngang. Til eru tvær gerðir af klukkuinngöngum, *active high* og *active low*.
+
+![Mynd 46](myndir/mynd-46.png)
+
+*Mynd 46: Klukkuinngangur, active high (til vinstri) og active low (til hægri).*
+
+*Active high*-inngangurinn er virkur þegar klukkupúlsinn breytist úr 0 í 1, þ.e. á forkanti. *Active low*-inngangurinn er virkur þegar klukkupúlsinn breytist úr 1 í 0, þ.e. á bakkanti. Þetta er líka kallað randstýrðar rásir. Klukkuinngangar eru auðkenndir með þríhyrningi.
+
+RS-vippa er eins og NAND-lás með klukkuinngangi.
+
+![Mynd 47](myndir/mynd-47.png)
+
+*Mynd 47: RS-vippa.*
+
+Í samfasa rásum breytast útgangarnir ekki um leið og inngangarnir breytast. Við þurfum því að skilgreina nýja gerð af sannleikstöflu, svokallaða stöðubreytingatöflu (*transition table*). Ný staða á útgangi getur nefnilega verið háð því hvaða staða var á útganginum þegar klukkupúlsinn kom. Núverandi útgangur, táknaður $Q^{n}$, er því talinn með inngöngunum í stöðubreytingatöflunni. Útgangur töflunnar verður staðan eftir næsta klukkupúls og er táknaður með $Q^{n+1}$.
+
+Taflan verður þá:
+
+| S | R | $Q^{n}$ | $Q^{n+1}$ | |
+|:-:|:-:|:-:|:-:|:--|
+| 0 | 0 | 0 | 0 | óbreytt (*hold*) |
+| 0 | 0 | 1 | 1 | óbreytt (*hold*) |
+| 0 | 1 | 0 | 0 | hreinsun (*reset*) |
+| 0 | 1 | 1 | 0 | hreinsun (*reset*) |
+| 1 | 0 | 0 | 1 | setning (*set*) |
+| 1 | 0 | 1 | 1 | setning (*set*) |
+| 1 | 1 | 0 | X | bannað |
+| 1 | 1 | 1 | X | bannað |
+
+Sé þessi tafla sett í K-kort fæst eftirfarandi útgangsjafna fyrir RS-vippu (bönnuðu stöðurnar eru notaðar sem 1):
+
+$$
+Q^{n+1} = S + \overline{R}Q^{n}
+$$
+
+Í bönnuðu stöðunni $S = R = 1$ fara báðir útgangarnir, Q og $\overline{Q}$, í hástöðu.
+
+### 3.5 T-vippur
+
+T-vippa (*toggle flip-flop*) er einföldust allra vippa. Hún skiptir einfaldlega um stöðu við forkant hvers klukkupúls. Hún hefur útgangsjöfnuna
+
+$$
+Q^{n+1} = \overline{Q^{n}}
+$$
+
+Tákn hennar er:
+
+![Mynd 48](myndir/mynd-48.png)
+
+*Mynd 48: Tákn T-vippu.*
+
+Púlsaritið er:
+
+![Mynd 49](myndir/mynd-49.png)
+
+*Mynd 49: Púlsarit T-vippu.*
+
+Það er hægt að nota hana t.d. til að lækka tíðni. Sjáum að Q-útgangurinn hefur helmingi lægri tíðni en T-inngangurinn. Við getum tengt nokkrar T-vippur saman á eftirfarandi hátt til að lækka tíðni.
+
+![Mynd 50](myndir/mynd-50.png)
+
+*Mynd 50: Tíðnideiling með T-vippum: 1000 Hz → 500 Hz → 250 Hz.*
+
+### 3.6 D-vippur
+
+D-vippa (*data flip-flop*) er notuð í teljara og gistur (koma síðar). Hún hefur einn samfasa inngang (*synchronous*) sem merktur er D. Hún hefur líka oftast tvo ósamfasa (*asynchronous*) innganga, *Set* og *Clear*. Ósamfasa þýðir að þeir inngangar eru ekki háðir klukkupúlsinum. Ef þeir fá merki setja þeir útganginn í 1 eða hreinsa hann í 0 óháð klukkunni. Þeir hafa því forgang fram yfir klukkuinnganginn.
+
+Útgangsjafna D-vippu er
+
+$$
+Q^{n+1} = D
+$$
+
+þ.e. núverandi staða á D flyst yfir á útganginn við næsta klukkupúls.
+
+Tákn D-vippu er:
+
+![Mynd 51](myndir/mynd-51.png)
+
+*Mynd 51: Tákn D-vippu, með active low (til vinstri) og active high (til hægri) ósamfasa inngöngum.*
+
+Ef við viljum ekki nota ósamfasa inngangana S og C verðum við að fasttengja þá í 1 ef þeir eru *active low* (vinstri myndin) eða í 0 ef þeir eru *active high* (hægri myndin).
+
+### 3.7 JK-vippur
+
+JK-vippa virkar svipað og RS-vippa með $J = S$ og $K = R$, nema hún hefur enga „bannaða“ stöðu. Bannaða staðan $R = S = 1$ verður víxlun (*toggle*) á JK-vippu ef $J = K = 1$.
+
+Stöðubreytingatafla JK-vippu er:
+
+| J | K | $Q^{n}$ | $Q^{n+1}$ | |
+|:-:|:-:|:-:|:-:|:--|
+| 0 | 0 | 0 | 0 | óbreytt (*hold*) |
+| 0 | 0 | 1 | 1 | óbreytt (*hold*) |
+| 0 | 1 | 0 | 0 | hreinsun (*reset*) |
+| 0 | 1 | 1 | 0 | hreinsun (*reset*) |
+| 1 | 0 | 0 | 1 | setning (*set*) |
+| 1 | 0 | 1 | 1 | setning (*set*) |
+| 1 | 1 | 0 | 1 | víxlun (*toggle*) |
+| 1 | 1 | 1 | 0 | víxlun (*toggle*) |
+
+Ef taflan er sett í K-kort sést að JK-vippa hefur útgangsjöfnuna:
+
+$$
+Q^{n+1} = J\overline{Q^{n}} + \overline{K}Q^{n}
+$$
+
+Til er einfölduð útgáfa af stöðubreytingatöflunni sem notuð er í teljararásum, þ.e. ef við höfum bara áhuga á stöðunum *hold* og *toggle*:
+
+| J | K | $Q^{n}$ | $Q^{n+1}$ | |
+|:-:|:-:|:-:|:-:|:--|
+| 0 | X | 0 | 0 | *hold* |
+| X | 0 | 1 | 1 | *hold* |
+| 1 | X | 0 | 1 | *toggle* |
+| X | 1 | 1 | 0 | *toggle* |
+
+Tákn JK-vippu er:
+
+![Mynd 52](myndir/mynd-52.png)
+
+*Mynd 52: Tákn JK-vippu.*
+
+S- og C-inngangarnir eru ósamfasa og hafa því forgang fram yfir J- og K-inngangana sem eru háðir klukkunni.
+
+### 3.8 Einföldun á sannleikstöflu JK-vippu
+
+Stöðubreytingatafla JK-vippu er hér til vinstri. Til hægri er henni raðað eftir breytingunni frá $Q^{n}$ í $Q^{n+1}$:
+
+| J | K | $Q^{n}$ | $Q^{n+1}$ | → | J | K | $Q^{n}$ | $Q^{n+1}$ |
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| **0** | 0 | **0** | **0** | | **0** | *0* | 0 | 0 |
+| 0 | **0** | **1** | **1** | | **0** | *1* | 0 | 0 |
+| **0** | 1 | **0** | **0** | | **1** | *0* | 0 | 1 |
+| 0 | **1** | **1** | **0** | | **1** | *1* | 0 | 1 |
+| **1** | 0 | **0** | **1** | | *0* | **1** | 1 | 0 |
+| 1 | **0** | **1** | **1** | | *1* | **1** | 1 | 0 |
+| **1** | 1 | **0** | **1** | | *0* | **0** | 1 | 1 |
+| 1 | **1** | **1** | **0** | | *1* | **0** | 1 | 1 |
+
+Ef við skoðum línur í sannleikstöflunni þar sem breytingin frá $Q^{n}$ í $Q^{n+1}$ er eins, þ.e. $0 \rightarrow 0$, $0 \rightarrow 1$, $1 \rightarrow 0$ og $1 \rightarrow 1$, sést að stundum skiptir ekki máli hvað J er og stundum ekki hvað K er.
+
+**Það sem skiptir máli er feitletrað í töflunni að ofan.**
+
+T.d. í breytingunni $0 \rightarrow 0$ skiptir ekki máli hvað K er svo við getum táknað það með x (*don't care*). Þannig er hægt að fara í gegnum allar stöður. Einfaldaða sannleikstaflan verður þá:
+
+| J | K | $Q^{n}$ (núverandi) | Breyting | $Q^{n+1}$ (næsta) |
+|:-:|:-:|:-:|:-:|:-:|
+| **0** | x | **0** | → | **0** |
+| x | **0** | **1** | → | **1** |
+| **1** | x | **0** | → | **1** |
+| x | **1** | **1** | → | **0** |
+
+### 3.9 Master–slave-vippur
+
+Master–slave-vippur eru búnar til með því að raðtengja tvær D-vippur (D-lása) og snúa klukkuinnganginum á seinni vippunni við með NOT-hliði.
+
+![Mynd 53](myndir/mynd-53.png)
+
+*Mynd 53: Master–slave-vippa.*
+
+Fyrri vippan (*master*) stýrir þeirri seinni (*slave*). Breytingin frá inngangi út á útgang tekur heilan klukkupúls í master–slave-vippu en ekki bara forkant eða bakkant eins og í venjulegri D-vippu. Á forkantinum les fyrri vippan stöðuna inn og geymir hana. Á bakkantinum er hún lesin út á Q-útganginn á seinni vippunni.
+
+### 3.10 Breyting úr einni vippugerð í aðra
+
+Hægt er að breyta einni vippugerð í aðra einfaldari með því að nota útgangsjöfnur þeirra:
+
+- **T-vippa:** $Q^{n+1} = \overline{Q^{n}}$
+- **D-vippa:** $Q^{n+1} = D$
+- **JK-vippa:** $Q^{n+1} = J\overline{Q^{n}} + \overline{K}Q^{n}$
+
+Búum til T-vippu úr D-vippu: Setjum = á milli útgangsjafna þeirra.
+
+$$
+Q^{n+1} = \overline{Q^{n}} \;\text{ og }\; Q^{n+1} = D \;\Rightarrow\; D = \overline{Q^{n}}
+$$
+
+![Mynd 54](myndir/mynd-54.png)
+
+*Mynd 54: T-vippa búin til úr D-vippu.*
+
+Búum til T-vippu úr JK-vippu: Setjum = á milli útgangsjafna þeirra.
+
+$$
+\overline{Q^{n}} = J\overline{Q^{n}} + \overline{K}Q^{n}
+$$
+
+Þetta gefur að $J = K = 1$ setur JK-vippuna í víxlstöðu (*toggle*).
+
+![Mynd 55](myndir/mynd-55.png)
+
+*Mynd 55: T-vippa búin til úr JK-vippu.*
+
+## 4. Ósamfasa og samfasa teljarar
+
+### 4.1 Ósamfasa teljarar
+
+Til eru tvær gerðir af teljurum, ósamfasa (*asynchronous*) og samfasa (*synchronous*). Ósamfasa teljarar eru þannig að klukkupúlsinn kemur bara inn á fyrstu vippuna og útgangur fyrstu vippunnar er síðan klukkuinngangur vippu númer 2 o.s.frv.
+
+Skoðum eftirfarandi ósamfasa teljara:
+
+![Mynd 56](myndir/mynd-56.png)
+
+*Mynd 56: Þriggja bita ósamfasa teljari með D-vippum og púlsarit hans.*
+
+Sjáum að D-vippurnar eru tengdar í víxltengingu (*toggle*). Fyrsta vippan víxlar á hverjum klukkupúlsi, önnur á öðrum hverjum og sú þriðja á fjórða hverjum. Q-útgangarnir mynda því rununa 111, 110, 101, 100, 011, 010, 001, 000, 111, … eða 7, 6, 5, 4, 3, 2, 1, 0, 7, … Þetta er því þriggja bita niðurteljari.
+
+$\overline{Q}$-útgangarnir búa hins vegar til öfuga runu við Q, þ.e. þeir mynda rununa 000, 001, 010, 011, 100, 101, 110, 111, 000, …, eða 0, 1, 2, 3, 4, 5, 6, 7, 0, … Þeir mynda því þriggja bita uppteljara.
+
+Gallinn við ósamfasa teljara er að það er seinkun í hverri vippu og ef tíðni klukkupúlsins er há er ekki víst að þær nái allar að fylgja eftir.
+
+### 4.2 Hönnun ósamfasa teljara
+
+Prófum að hanna 3 bita ósamfasa teljara sem telur 7, 6, 5, 4, 3, 7, 6, … Við þurfum því að „setja“ teljarann í stöðunni 2, þ.e. þvinga alla útgangana í 1 svo að hann byrji aftur í 7 (7 = 111). Staðan 2 er 010. Þegar hún kemur upp þurfum við að fá 1 inn á *Set*-inngangana (gerum ráð fyrir að þeir séu *active high*).
+
+![Mynd 57](myndir/mynd-57.png)
+
+*Mynd 57: Rás sem gefur út 1 í stöðunni $Q_2Q_1Q_0 = 010$.*
+
+Rásin á mynd 57 gefur út 1 í stöðunni 010 en 0 annars. Við getum því notað hana til þess að setja vippurnar í 111.
+
+![Mynd 58](myndir/mynd-58.png)
+
+*Mynd 58: Teljari sem telur 7, 6, 5, 4, 3, 7, 6, …*
+
+Þessi teljari telur því 7, 6, 5, 4, 3, 7, 6, …
+
+Ef við viljum hanna uppteljara þarf að breyta tengingunum í rásinni á eftirfarandi hátt:
+
+![Mynd 59](myndir/mynd-59.png)
+
+*Mynd 59: Breyttar tengingar fyrir uppteljara.*
+
+eða nota $\overline{Q}$-útgangana inn á skjáinn.
+
+![Mynd 60](myndir/mynd-60.png)
+
+*Mynd 60: JK 4 bita ósamfasa niðurteljari í Electronics Workbench.*
+
+![Mynd 61](myndir/mynd-61.png)
+
+*Mynd 61: JK 4 bita ósamfasa uppteljari í Electronics Workbench.*
+
+### 4.3 Hönnun samfasa teljara
+
+Hönnun samfasa teljara fer fram í 6 skrefum:
+
+1. Stöðurit (*state diagram*)
+2. Stöðutafla (*state table*)
+3. Stöðubreytingatafla (*transition table*)
+4. Örvunarkort (*excitation maps*)
+5. Örvunarjöfnur (*excitation equations*)
+6. Rásin teiknuð
+
+#### Dæmi 1
+
+Hönnum samfasa teljara sem telur 0-1-2-3-0-1-2-3 …
+
+**Stöðurit**
+
+![Mynd 62](myndir/mynd-62.png)
+
+*Mynd 62: Stöðurit teljara sem telur 0, 1, 2, 3, 0, …*
+
+**Stöðutafla**
+
+$S^{n}$ er núverandi staða og $S^{n+1}$ er næsta staða.
+
+| $S^{n}$ | $S^{n+1}$ |
+|:-:|:-:|
+| S0 | S1 |
+| S1 | S2 |
+| S2 | S3 |
+| S3 | S0 |
+
+**Stöðubreytingatafla**
+
+Hér tengjum við hverja stöðu í stöðutöflunni við útganga vippanna. Þetta er tveggja bita teljari svo við notum tvær vippur og köllum útgangana $Q_{0}$ (LSB) og $Q_{1}$ (MSB). Skref 1 til 3 eru óháð vippugerð.
+
+| Staða | $Q_{1}^{n}$ | $Q_{0}^{n}$ | $Q_{1}^{n+1}$ | $Q_{0}^{n+1}$ |
+|:-:|:-:|:-:|:-:|:-:|
+| S0 | 0 | 0 | 0 | 1 |
+| S1 | 0 | 1 | 1 | 0 |
+| S2 | 1 | 0 | 1 | 1 |
+| S3 | 1 | 1 | 0 | 0 |
+
+**Örvunarkort**
+
+Hér þurfum við að ákveða hvaða vippugerð við notum. Notum D-vippur. Það er einfaldara að hanna með D-vippum en rásirnar vilja verða flóknari en ef við notum JK-vippur. Örvunarkortið er eins konar K-kort þar sem hver reitur inniheldur gildið á D-innganginum sem þarf til þess að vippan skipti úr stöðu $n$ yfir í stöðu $n+1$ við næsta klukkupúls. Við erum með tvo innganga, $D_{0}$ og $D_{1}$, og þurfum að búa til sitt kortið fyrir hvorn.
+
+![Mynd 63](myndir/mynd-63.png)
+
+*Mynd 63: Örvunarkort fyrir $D_{0}$ og $D_{1}$.*
+
+Sjáum að í fyrra kortinu höfum við bara áhuga á seinni bitanum. Það er vegna þess að $D_{0}$-inngangurinn getur bara breytt honum; hann er $Q_{0}$. Til þess að breyta $Q_{0}$ úr 0 í 1 þarf $D_{0}$ að vera 1 þegar klukkupúlsinn kemur. Útgangsjafna D-vippu er $Q^{n+1} = D$.
+
+Næst hópum við saman reiti sem innihalda 1, lóðrétt eða lárétt.
+
+Í fyrra kortinu getum við hópað saman tvo reiti lóðrétt. Þeir innihalda stöðurnar 00 og 10. Sjáum að $Q_{1}$ breytist (er 0 og 1) og dettur því út. $Q_{0}$-útgangurinn er hins vegar 0 í báðum reitum og verður því $D_{0} = \overline{Q_{0}}$ í jöfnunni.
+
+Í seinna kortinu náum við ekki að hópa neitt saman og reitirnir sem innihalda 1 verða því stakir. Sá sem er efst til hægri inniheldur 01 og verður því $\overline{Q_{1}}\cdot Q_{0}$. Hinn inniheldur 10 og verður því $Q_{1}\cdot\overline{Q_{0}}$. Saman mynda þeir jöfnuna:
+
+$$
+D_{1} = \overline{Q_{1}}\cdot Q_{0} + Q_{1}\cdot\overline{Q_{0}} = Q_{1} \oplus Q_{0}
+$$
+
+Þetta er því XOR-hlið.
+
+**Örvunarjöfnur**
+
+Við fundum þær í skrefi 4:
+
+$$
+D_{0} = \overline{Q_{0}} \qquad D_{1} = \overline{Q_{1}}\cdot Q_{0} + Q_{1}\cdot\overline{Q_{0}} = Q_{1} \oplus Q_{0}
+$$
+
+**Rásin teiknuð**
+
+![Mynd 64](myndir/mynd-64.png)
+
+*Mynd 64: Samfasa teljari sem telur 0, 1, 2, 3, 0, …*
+
+Sjáum að fyrri D-vippan er tengd í víxlham (*toggle mode*), þ.e. næsta staða verður öfug við núverandi stöðu.
+
+Þetta er frekar einfaldur teljari. Þegar við höfum náð góðu valdi á þessari hönnun er nóg að byrja í skrefi 4, þ.e. fara beint í örvunarkortið. Fyrstu þrjú skrefin eru frekar einföld.
+
+### 4.4 Fleiri teljarar
+
+Hönnum nú flóknari teljara: BCD-teljara með JK-vippum. Hann telur frá 0 upp í 9, þ.e. tugakerfistölurnar.
+
+JK-vippa hefur útgangsjöfnuna $Q^{n+1} = J\overline{Q^{n}} + \overline{K}Q^{n}$. Út frá þessari jöfnu má setja upp stöðubreytingatöfluna (X = skiptir ekki máli):
+
+| J | K | $Q^{n}$ | $Q^{n+1}$ | |
+|:-:|:-:|:-:|:-:|:--|
+| 0 | X | 0 | 0 | *hold* |
+| X | 0 | 1 | 1 | *hold* |
+| 1 | X | 0 | 1 | *toggle* |
+| X | 1 | 1 | 0 | *toggle* |
+
+Við höfum bara áhuga á stöðunum *toggle* og *hold* og þess vegna getum við notað þessa einfölduðu sannleikstöflu fyrir JK-vippu. Það er nefnilega kostur að fá margar stöður sem skipta ekki máli (X = *don't care*) því við getum ráðið því hvort við notum þær sem 1 eða 0 í K-kortinu.
+
+Til þess að telja 0 … 9 þurfum við fjórar JK-vippur. Við þurfum því að búa til átta örvunarkort, þ.e. fyrir $J_{0}, K_{0}, \ldots, J_{3}, K_{3}$.
+
+Þær stöður sem við notum ekki, þ.e. tölurnar frá 10 til 15 (1010 til 1111), setjum við inn sem X, eða stöður sem skipta ekki máli (*don't care*).
+
+![Mynd 65](myndir/mynd-65.png)
+
+*Mynd 65: Örvunarkort BCD-teljarans.*
+
+Út frá þessum kortum koma jöfnurnar:
+
+$$
+J_{0} = 1,\quad K_{0} = 1,\quad J_{1} = Q_{0}\cdot\overline{Q_{3}},\quad K_{1} = Q_{0},\quad J_{2} = Q_{0}\cdot Q_{1},\quad K_{2} = Q_{0}\cdot Q_{1},\quad J_{3} = Q_{0}\cdot Q_{1}\cdot Q_{2},\quad K_{3} = Q_{0}
+$$
+
+Þá er hægt að teikna teljarann:
+
+![Mynd 66](myndir/mynd-66.png)
+
+*Mynd 66: BCD-teljari með JK-vippum.*
+
+Útgangana $Q_{0}$ til $Q_{3}$ má síðan tengja inn á skjá. Þetta er líka gott verkefni til þess að stilla upp í Multisim eða Electronics Workbench.
+
+![Mynd 67](myndir/mynd-67.png)
+
+*Mynd 67: BCD-teljarinn í hermiforriti.*
+
+S- og R-inngangarnir eru *active high* og því þarf að tengja þá í $0\,\mathrm{V}$. Sjáum líka að klukkuinngangurinn á JK-vippunum er *active low*. Það kemur ekki að sök; þær skipta þá á bakkanti klukkupúlsins.
+
+### 4.5 Greining samfasa teljara
+
+Ef við fáum í hendurnar mynd af samfasa teljara, hvernig getum við séð hvernig hann telur?
+
+Við þurfum að hugsa þetta vandamál sem öfuga hönnun, þ.e. við rekjum okkur frá teikningunni af rásinni að forsendum hönnunarinnar, þ.e. hvernig teljarinn á að telja. Tökum dæmi:
+
+![Mynd 68](myndir/mynd-68.png)
+
+*Mynd 68: Samfasa teljari sem á að greina.*
+
+**I. Örvunarjöfnur:**
+
+a) $D_{0} = \overline{Q_{0}}$ \
+b) $D_{1} = Q_{0} \oplus Q_{1}$
+
+**II. Stöðubreytingajöfnur.** Útgangsjafna D-vippu er $Q^{n+1} = D$:
+
+a) $Q_{0}^{n+1} = D_{0} = \overline{Q_{0}} \;\Rightarrow\; Q_{0}^{n+1} = \overline{Q_{0}^{n}}$ \
+b) $Q_{1}^{n+1} = D_{1} = Q_{0} \oplus Q_{1} \;\Rightarrow\; Q_{1}^{n+1} = Q_{0}^{n} \oplus Q_{1}^{n}$
+
+**III. Stöðubreytingatafla:**
+
+| Staða$^{n}$ | $Q_{1}^{n}$ | $Q_{0}^{n}$ | $Q_{1}^{n+1} = Q_{0}^{n} \oplus Q_{1}^{n}$ | $Q_{0}^{n+1} = \overline{Q_{0}^{n}}$ | Staða$^{n+1}$ |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| S0 | 0 | 0 | 0 | 1 | S1 |
+| S1 | 0 | 1 | 1 | 0 | S2 |
+| S2 | 1 | 0 | 1 | 1 | S3 |
+| S3 | 1 | 1 | 0 | 0 | S0 |
+
+Sjáum hér að talningin er S0 → S1 → S2 → S3 → S0 …, eða 0, 1, 2, 3, 0, …
+
+#### Dæmi 2
+
+**Greinið teljarann á myndinni.**
+
+![Mynd 69](myndir/mynd-69.png)
+
+*Mynd 69: Teljarinn í dæmi 2.*
+
+**Lausn:** Útgangsjafna JK-vippu er $Q^{n+1} = J\cdot\overline{Q^{n}} + \overline{K}\cdot Q^{n}$. Af myndinni lesum við:
+
+$$
+J_{0} = 1,\quad K_{0} = 1,\quad J_{1} = \overline{Q_{0}},\quad K_{1} = \overline{Q_{0}}
+$$
+
+$$
+Q_{0}^{n+1} = J_{0}\cdot\overline{Q_{0}^{n}} + \overline{K_{0}}\cdot Q_{0}^{n} = 1\cdot\overline{Q_{0}^{n}} + \overline{1}\cdot Q_{0}^{n} = \overline{Q_{0}^{n}}
+$$
+
+$$
+Q_{1}^{n+1} = J_{1}\cdot\overline{Q_{1}^{n}} + \overline{K_{1}}\cdot Q_{1}^{n} = \overline{Q_{0}^{n}}\cdot\overline{Q_{1}^{n}} + Q_{0}^{n}\cdot Q_{1}^{n} = \overline{Q_{0}^{n} \oplus Q_{1}^{n}} \quad\text{(XNOR)}
+$$
+
+| $Q_{1}^{n}$ | $Q_{0}^{n}$ | $Q_{1}^{n+1} = \overline{Q_{0}^{n} \oplus Q_{1}^{n}}$ | $Q_{0}^{n+1} = \overline{Q_{0}^{n}}$ |
+|:-:|:-:|:-:|:-:|
+| 0 | 0 | 1 | 1 |
+| 0 | 1 | 0 | 0 |
+| 1 | 0 | 0 | 1 |
+| 1 | 1 | 1 | 0 |
+
+S0 → S3, S1 → S0, S2 → S1, S3 → S2, þ.e. teljarinn telur 0, 3, 2, 1, 0, 3, … (niðurteljari).
+
+#### Verkefni
+
+Greinið teljarann á myndinni.
+
+![Mynd 70](myndir/mynd-70.png)
+
+*Mynd 70: Teljarinn í verkefninu.*
+
+$D_{0} =$ \
+$D_{1} =$ \
+$D_{2} =$
+
+## 5. Notkun teljara
+
+### 5.1 74192 BCD-teljari
+
+74192 er tilbúinn MOD10- eða BCD-teljari (0–9). Hann getur talið bæði upp og niður og auðvelt er að tengja nokkra saman ef telja á stærri tölur. Við þurfum einn fyrir 0–9, tvo fyrir 0–99, þrjá fyrir 0–999 o.s.frv. Hann hefur fjóra gagnainnganga (*Input A* til *Input D*) til þess að setja inn fyrir fram ákveðna stöðu (*preset*). Hún er lesin inn með því að setja $0\,\mathrm{V}$ inn á $\overline{\mathrm{LOAD}}$-innganginn (*active low*). Ef við ætlum ekki að nota fyrir fram gefnar stöður festum við $\overline{\mathrm{LOAD}}$-innganginn í $+5\,\mathrm{V}$ og gerum hann þannig óvirkan.
+
+Teljarinn er endursettur með því að setja $+5\,\mathrm{V}$ inn á *Clear*-innganginn (*active high*). Klukkuinngangarnir eru tveir, *Count Down* (niðurtalning) og *Count Up* (upptalning). $\overline{\mathrm{Borrow}}$- og $\overline{\mathrm{Carry}}$-útgangarnir stýra klukkuinngöngunum á næsta teljara á eftir til að lækka eða hækka gildi hans. Útgangarnir *Output A* til *Output D* eru síðan teknir inn á sjö ráka afkóðunarrás (7447 eða 7448) sem er síðan tengd inn á sjö ráka staf (skjá).
+
+![Mynd 71](myndir/mynd-71.png)
+
+*Mynd 71: Tenging á einum 74192-teljara við sjö ráka afkóðunarrás og sjö ráka staf. Stöðurnar á gagnainngöngum teljarans eru x (don't care) því þær skipta ekki máli ef $\overline{\mathrm{LOAD}}$ er í $+5\,\mathrm{V}$.*
+
+![Mynd 72](myndir/mynd-72.png)
+
+*Mynd 72: Upp- og niðurteljari sem telur 0–999 eða 999–0.*
+
+Sjáum hvernig $\overline{\mathrm{Carry}}$ og $\overline{\mathrm{Borrow}}$ stýra klukkuinngöngum næsta teljara á eftir. Þegar fyrsti teljarinn skiptir úr 9 í 0 sendir $\overline{\mathrm{Carry}}$-útgangurinn púls inn á næsta teljara og hækkar hann um 1 (hækkun á tug). Þegar teljari nr. 2 skiptir úr 9 í 0 sendir hann púls inn á þriðja teljarann og hækkar hann um 1 (hækkun á hundraði).
+
+### 5.2 MOD6-teljari búinn til úr 74192 BCD-teljara
+
+Hægt er að búa til MOD6-teljara (0–5) úr 74192 BCD-teljara. Hann endursetur sig (*Clear*) á tölunni CBA = 110 sem er 6 í tugakerfi. Hann telur því 0-1-2-3-4-5-0-1-2-3-4 …
+
+A-útgangurinn er 0 og þarf því að fara í gegnum NOT-hlið til að fá stöðuna 111 inn á AND-hliðið. Þá gefur AND-hliðið 1 inn á *Clear*-innganginn og endursetur teljarann í stöðuna 0. AND-hliðið gefur alltaf út 0 nema í stöðunni 110; þá gefur það út 1.
+
+MOD6-teljarinn ásamt BCD-teljaranum er nauðsynlegur í hönnun á klukku þar sem sekúndur og mínútur endursetja sig eftir stöðuna 59, þ.e. þær fara úr 59 í 00.
+
+![Mynd 73](myndir/mynd-73.png)
+
+*Mynd 73: MOD6-teljari búinn til úr 74192.*
+
+Það er hægt að búa til hvaða MOD-teljara sem er frá MOD2 til MOD9 með þessum teljara. Stöðurnar sem eiga að hreinsa teljarann eru settar inn á AND-hlið sem gefur $+5\,\mathrm{V}$ inn á *Clear* við rétta stöðu. **Athugið:** Teljari sem telur 0–7 endursetur sig í stöðunni 8 = 1000. Það er alltaf staðan sem er einum hærri en talan sem við viljum enda lotuna á. Þess vegna heitir teljari sem telur 0–9 MOD10 og teljari sem telur 0–5 MOD6. MOD10 hefur 10 stöður, 0–9, og MOD6 hefur 6 stöður, 0–5.
+
+MOD10 er líka kallaður BCD-teljari (*Binary Coded Decimal*) því hann sýnir bara tugakerfistölustafi.
+
+Einnig er til teljarinn 74193 sem er MOD16- eða HEX-teljari og hefur 16 stöður.
+
+### 5.3 7447 og 7448 sjö ráka afkóðunarrásir
+
+**Seven Segment Decoder, CA og CC.**
+
+Sjö ráka afkóðunarrásirnar (*seven segment decoders*) breyta fjögurra bita innmerki í sjö útganga fyrir sjö ráka staf. Inngangarnir heita *Input A* (LSB), *Input B*, *Input C* og *Input D* (MSB).
+
+Afkóðunarrásirnar sýna tölustafina 0 til 9 fyrir inngangana DCBA = 0000 til 1001. Það er síðan misjafnt eftir gerðum afkóðunarrása hvað þær sýna fyrir inngangana DCBA = 1010–1111, eða 10–15. Sumar rásir, eins og t.d. 7447 og 7448, sýna einhver tákn fyrir 10–14 og staðan 1111 = 15 slekkur á stafnum. Aðrar afkóðunarrásir sýna HEX-tölur (sextándukerfi) fyrir ofan 9 (A, b, C, d, E, F).
+
+![Mynd 74](myndir/mynd-74.png)
+
+*Mynd 74: Sjö ráka afkóðunarrás.*
+
+**Lamp Test-inngangurinn, $\overline{\mathrm{LT}}$ (stafprófun)**
+
+*Lamp Test*-inngangurinn er *active low* ($\overline{\mathrm{LT}}$) og verður því virkur í lágstöðu. Sé hann settur í lágstöðu kveikir hann á öllum útgöngum afkóðunarrásarinnar og ef tölustafurinn 8 birtist er stafurinn í lagi. Sé ekki verið að nota *Lamp Test* verður $\overline{\mathrm{LT}}$-inngangurinn að vera fastur í $5\,\mathrm{V}$ (1). Þá er hann óvirkur eða hlutlaus.
+
+![Mynd 75](myndir/mynd-75.png)
+
+*Mynd 75: Notkun á Lamp Test. Stöður sem skiptir ekki máli hvort eru 0 eða 1 (don't care) eru merktar með x. Setjum $0\,\mathrm{V}$ inn á $\overline{\mathrm{LT}}$-innganginn á öllum rásunum.*
+
+**RBI- og RBO-inngangarnir og núllbæling (*zero suppression*)**
+
+Þegar sýna á tölu eins og t.d. 35 á þriggja stafa skjá myndi hann að öllu óbreyttu sýna 035.
+
+![Mynd 76](myndir/mynd-76.png)
+
+*Mynd 76: Talan 35 á þriggja stafa skjá án núllbælingar.*
+
+Til þess að sleppa því að sýna óþörf núll, t.d. hundruð í tugatölu eða hundruð og tugi í einingatölu, notum við núllbælingu (*zero suppression*).
+
+![Mynd 77](myndir/mynd-77.png)
+
+*Mynd 77: Talan 35 með núllbælingu.*
+
+Reglan er sú að ef $\overline{\mathrm{BI}} = 0$ og DCBA = 0000 slekkur afkóðunarrásin á útgöngum sínum og þá slokknar á stafnum. Hún sendir um leið stöðuna 0 frá $\overline{\mathrm{RBO}}$-útganginum inn á $\overline{\mathrm{BI}}$ á næstu afkóðunarrás fyrir neðan í röðinni.
+
+Tökum annað dæmi og skrifum út töluna 7 (007) með núllbælingu.
+
+![Mynd 78](myndir/mynd-78.png)
+
+*Mynd 78: Talan 7 (007) með núllbælingu.*
+
+Hér fær afkóðunarrásin fyrir hundruð fasta $0\,\mathrm{V}$ spennu inn á $\overline{\mathrm{BI}}$-innganginn og núllbæling er því virk á henni. Þegar gagnainngangar hennar verða DCBA = 0000 slekkur hún á útgöngunum a til g og sendir $0\,\mathrm{V}$ frá $\overline{\mathrm{RBO}}$-útganginum inn á $\overline{\mathrm{BI}}$-innganginn á afkóðunarrásinni fyrir tugi. Þegar gagnainngangar tuganna verða líka DCBA = 0000 slekkur afkóðunarrásin fyrir tugina á útgöngunum a til g og sendir $0\,\mathrm{V}$ inn á $\overline{\mathrm{BI}}$-innganginn á afkóðunarrásinni fyrir einingar. En þar sem gagnainngangar afkóðunarrásarinnar fyrir einingar eru DCBA = 0111 en ekki 0000 birtir hún töluna 7.
+
+### 5.4 Sjö ráka stafur búinn til úr ljósdíóðum
+
+Stundum þarf stærri stafi en hægt er að kaupa tilbúna. Þá er hægt að smíða sína eigin sjö ráka stafi úr ljósdíóðum.
+
+| Útgáfa 1 | Útgáfa 2 |
+|:-:|:-:|
+| ![Mynd 79](myndir/mynd-79.png) | ![Mynd 80](myndir/mynd-80.png) |
+| Mynd 79: 10 mm LED, 2,4 V, 50 mA. Einföld röð, 10 ljósdíóður raðtengdar í hverri rák. Samtals 70 ljósdíóður. Tengt með sameiginlegu skauti, CA (sameiginlegur +). | Mynd 80: 10 mm LED, 2,4 V, 50 mA. Tvöföld röð, 5 ljósdíóður raðtengdar í hvorri grein. Samtals 70 ljósdíóður. Tengt með sameiginlegu skauti, CA (sameiginlegur +). |
+
+Það er ljóst að 7448-rásin getur ekki drifið svona stóra stafi beint og því þarf að setja Darlington-rekilinn ULN2003 á milli.
+
+### 5.5 Darlington-rekillinn ULN2003A
+
+![Mynd 81](myndir/mynd-81.png)
+
+*Mynd 81: ULN2003A.*
+
+Þótt stóru ljósstafirnir séu tengdir með sameiginlegu forskauti (CA) þarf samt 7448-rásina (CC) til að kóða stafina. Það er vegna þess að ULN2003A-rásin er með viðsnúnum (*inverted*) útgangi og 7448 og ULN2003A vinna því saman eins og 7447-rás með margfalda aflgetu.
+
+![Mynd 82](myndir/mynd-82.png)
+
+*Mynd 82: 7448 og ULN2003A stýra stórum sjö ráka staf.*
+
+$+V_{CC}$-inngangurinn á ULN2003-rásinni þarf að fá sömu jákvæðu spennu og stafurinn fær, eða $+24\,\mathrm{V}$. ULN2003-rásin tengir síðan hverja rák (*segment*) við $0\,\mathrm{V}$ og þannig kviknar á rákinni.
+
+![Mynd 83](myndir/mynd-83.png)
+
+*Mynd 83: Innáskiptispjald fyrir fótbolta. 8 stk. 10 mm LED í hverri rák.*
+
+#### Verkefni: Teljari 0–99
+
+Hér er prentplata fyrir teljara sem telur 0–99 bæði upp og niður.
+
+![Mynd 84](myndir/mynd-84.png)
+
+*Mynd 84: Prent fyrir teljararás. Stærri platan er 82 mm × 55 mm og sú minni 65 mm × 41 mm.*
+
+![Mynd 85](myndir/mynd-85.png)
+
+*Mynd 85: Tengimynd fyrir teljarann.*
+
+![Mynd 86](myndir/mynd-86.png)
+
+*Mynd 86: Teljarinn 0–99 tilbúinn.*
+
+Þessa rás er síðan hægt að setja í lítinn kassa. Jafnvel má nota tvær saman og þá er komið stigaborð fyrir spurningakeppni ☺
+
+### 5.6 Sérstakir teljarar
+
+#### 5.6.1 Johnson-teljari
+
+4 bita Johnson-teljari telur:
+
+0000 – 1000 – 1100 – 1110 – 1111 – 0111 – 0011 – 0001 – 0000 …
+
+Hann er búinn til úr fjórum D-vippum sem tengdar eru saman í halarófu en samfasa.
+
+![Mynd 87](myndir/mynd-87.png)
+
+*Mynd 87: Tengimynd Johnson-teljara.*
+
+![Mynd 88](myndir/mynd-88.png)
+
+*Mynd 88: Johnson-teljari í hermiforriti.*
+
+#### 5.6.2 Overbeck-teljari (hringteljari)
+
+4 bita Overbeck-teljari (oftast kallaður hringteljari, *ring counter*) telur 1000 – 0100 – 0010 – 0001 – 1000 … Það er alltaf bara einn útgangur í stöðunni 1 í einu. Hann þarf þó að fá einn púls inn á D-inngang fyrstu vippu til að fara í gang.
+
+![Mynd 89](myndir/mynd-89.png)
+
+*Mynd 89: Tengimynd Overbeck-teljara.*
+
+![Mynd 90](myndir/mynd-90.png)
+
+*Mynd 90: Overbeck-teljari í hermiforriti.*
+
+#### 5.6.3 Klukka
+
+Til að búa til klukku þurfum við þrjá MOD10-teljara, tvo MOD6-teljara og einn MOD3-teljara (tugir klukkustunda, 0–2). Klukkan á að endursetja sig eftir stöðuna 23:59:59 og fara í 00:00:00. Við þurfum því að skoða sérstaklega MOD3- og MOD10-teljarana fyrir klukkustundirnar. Þeir endursetja sig þegar klukkan reynir að fara í 24:00:00. Það er því staðan 24 á klukkustundunum sem við notum til að endursetja þær. Mínútur og sekúndur endursetja sig sjálfar. $24 = 0010\;0100_{BCD}$. Við getum því notað þá bita sem eru 1 akkúrat í þessari stöðu. Það er $Q_{1}$ á tugateljaranum og $Q_{2}$ á MOD10-teljaranum. Í sjálfu sér þarf ekki sérstakan MOD3-teljara fyrir tugi klukkustundanna. Hægt er að nota MOD10-teljara því hann er hvort sem er endursettur í stöðunni 24:00:00.
+
+![Mynd 91](myndir/mynd-91.png)
+
+*Mynd 91: Klukka búin til með 74192 BCD-teljararásum. Raða þarf stöfunum í rétta röð.*
+
+Ef við skoðum klukkustundirnar sérstaklega sést að þær endursetja sig þegar 23 breytist í 24. Breytingin er frá 0010 0011 yfir í 0010 0100. Við getum því notað bitana sem eru 1 í stöðunni 24 til að endursetja klukkustundirnar. Það er *Output B* á tugunum og *Output C* á einingunum. Tökum þessa útganga inn á AND-hlið sem endursetur síðan tvo öftustu teljarana og staðan fer úr 24:00:00 í 00:00:00.
+
+![Mynd 92](myndir/mynd-92.png)
+
+*Mynd 92: 24 stunda klukka úr hermiforriti. Hér er 74192-rásin ekki notuð heldur eru allir teljarar hannaðir sérstaklega með JK-vippum. Þeim er síðan breytt í undirrásir (Sub Circuit) í forritinu og gefin nöfnin Mod_2, Mod_6 og Mod_10. Klukkuna má stilla á hærri tíðni en 1 Hz til að flýta fyrir hermun.*
+
+## 6. Gistur (*registers*)
+
+Gistur eru rásir sem geta geymt eina tvíundartölu, 8, 16, 32 eða 64 bita, og eru því eins konar minni. T.d. ef tölva leggur saman tvær tölur sem geymdar eru í vinnsluminni les hún þær fyrst inn í gistur og sækir þær þangað til þess að leggja þær saman í reiknirás. Gistur eru búin til úr vippum, yfirleitt D-vippum. Gistur tapa innihaldi sínu við straumleysi og eru því hvikult (*volatile*) minni.
+
+> **Vippur** geyma einn bita.\
+> **Gistur** geyma eina tvíundartölu af ýmsum stærðum.\
+> **Minni** geyma margar tvíundartölur.
+
+Til eru tvær megingerðir af gistrum:
+
+1. **Samhliða gistur** (*parallel register*): Talan er öll lesin inn í einum klukkupúlsi. Eingöngu notuð á stuttum vegalengdum, þ.e. á móðurborði.
+2. **Raðgistur** (*serial register*): Talan er lesin inn bita fyrir bita í mörgum klukkupúlsum. Mest notuð fyrir samskipti á löngum vegalengdum, þ.e. á milli tölva.
+
+Síðan er til sambland af þessu tvennu, þ.e. samhliða inn / rað út og rað inn / samhliða út.
+
+### 6.1 Samhliða inn / samhliða út gistur
+
+Skoðum fyrst samhliða inn / samhliða út gistur. Miðum við 4 bita; hugsunin breytist ekkert þótt bitum (vippum) sé bætt við.
+
+Skoðum þessa rás:
+
+![Mynd 93](myndir/mynd-93.png)
+
+*Mynd 93: 4 bita samhliða inn / samhliða út gistur.*
+
+**Uppbygging rásarinnar.** Munum að útgangsjafna D-vippu er $Q^{n+1} = D$, þ.e. næsti útgangur Q er staðan sem bíður á D-innganginum. Þegar WR-inngangurinn (*write*) breytist úr 0 í 1 flyst staðan sem bíður á inngöngunum $I_{3}$ til $I_{0}$ (1010) yfir á útgangana $O_{3}$ til $O_{0}$. Við höfum því lesið töluna 1010 inn í gistrið og þar verður hún þangað til næsti WR-púls kemur og les inn nýja stöðu frá inngöngunum.
+
+![Mynd 94](myndir/mynd-94.png)
+
+*Mynd 94: Talan 1010 lesin inn í gistrið.*
+
+Við lesum því alla bitana inn í einum púlsi.
+
+![Mynd 95](myndir/mynd-95.png)
+
+*Mynd 95: Tákn fyrir 4 bita samhliða inn / samhliða út gistur.*
+
+### 6.2 Samhliða gistur með þrístöðuútgangi (*tristate logic, buffer*)
+
+Stundum viljum við stjórna því hvenær innihald gisturs verður aðgengilegt á gagnabraut. Það er gert með því að nota svokallaða **þrístöðurás**. Hún er með tvo innganga og einn útgang. Annar inngangurinn er stýriinngangur (*Enable*) og er ýmist *active low* eða *active high*. Hann stýrir því hvort rásin leiðir eða ekki. Ef stýriinngangurinn er virkur leiðir rásin beint á milli inngangs og útgangs. Ef hann er óvirkur er útgangurinn aftengdur rásinni.
+
+| ![Mynd 96](myndir/mynd-96.png) | ![Mynd 97](myndir/mynd-97.png) | ![Mynd 98](myndir/mynd-98.png) |
+|:-:|:-:|:-:|
+| Mynd 96: Tákn fyrir þrístöðurás með *active low* Enable-inngang. | Mynd 97: $\overline{E} = 0 \Rightarrow O = I$; $I = 1 \Rightarrow O = 1$, $I = 0 \Rightarrow O = 0$. | Mynd 98: $\overline{E} = 1$: O er opin rás, aftengd frá gagnabraut. |
+
+![Mynd 99](myndir/mynd-99.png)
+
+*Mynd 99: Gistur með þrístöðurás á útgangi.*
+
+**Uppbygging rásarinnar.** Við skrifum í gistrið með því að setja $\overline{\mathrm{WR}}$-innganginn í lágstöðu (gefum einn klukkupúls). Eftir það er staðan 1010 komin á innganga þrístöðurásarinnar.
+
+![Mynd 100](myndir/mynd-100.png)
+
+*Mynd 100: Skrifað í gistrið.*
+
+Ef við viljum lesa innihaldið út er nóg að setja $\overline{\mathrm{RD}}$-innganginn í lágstöðu og staðan 1010 birtist á útgöngunum $O_{3}$ til $O_{0}$.
+
+![Mynd 101](myndir/mynd-101.png)
+
+*Mynd 101: Lesið úr gistrinu.*
+
+![Mynd 102](myndir/mynd-102.png)
+
+*Mynd 102: Tákn fyrir samhliða inn/út gistur með þrístöðurás á útgangi.*
+
+### 6.3 Tvístefnugistur (*bidirectional registers*)
+
+Tvístefnugistur hafa sameiginlega inn- og útganga. Þeir kallast D (*data*) í stað I og O áður og eru tengdir beint við gagnabrautina. Við notum stýriinnganga til þess að stjórna því hvort þeir virka sem inngangar eða útgangar.
+
+![Mynd 103](myndir/mynd-103.png)
+
+*Mynd 103: Tvístefnugistur.*
+
+**Uppbygging rásarinnar.** Til þess að lesa inn í gistrið er $\overline{\mathrm{WR}}$-inngangurinn settur í lágstöðu í augnablik. Þá færast tölurnar af inngöngunum inn á útganga vippanna en stoppa við þrístöðurásina.
+
+![Mynd 104](myndir/mynd-104.png)
+
+*Mynd 104: Tala lesin inn í gistrið. $\overline{\mathrm{WR}}$-línan (write) er virk og $D_{3}$ til $D_{0}$ eru lesin inn.*
+
+![Mynd 105](myndir/mynd-105.png)
+
+*Mynd 105: Lesið út úr tvístefnugistri.*
+
+Til þess að lesa út er $\overline{\mathrm{RD}}$-inngangurinn (*read*) settur í lágstöðu. Þrístöðurásin verður þá virk og tölurnar verða aðgengilegar á útgöngunum.
+
+![Mynd 106](myndir/mynd-106.png)
+
+*Mynd 106: Tákn fyrir 4 bita tvístefnt samhliða gistur.*
+
+Oftast eru gistur sett upp sem blokkir og þá þarf að setja upp einhverja stýringu sem stjórnar því í hvaða gistur á að skrifa og úr hvaða gistri á að lesa.
+
+![Mynd 107](myndir/mynd-107.png)
+
+*Mynd 107: Fjögur 4 bita gistur tengd við sameiginlega 4 bita gagnabraut.*
+
+Hönnum stýringu sem gerir okkur kleift að koma öllum gistrunum fyrir í einni rás með 4 inngöngum og 4 útgöngum. $A_{0}$ og $A_{1}$ stýra því hvert af gistrunum fjórum er virkt. $\overline{E}$ stjórnar því hvort gistrin sem heild eru virk eða óvirk og $R/\overline{W}$-inngangurinn ákvarðar hvort við lesum gögn út ($R/\overline{W} = 1$) eða skrifum þau inn ($R/\overline{W} = 0$).
+
+![Mynd 108](myndir/mynd-108.png)
+
+*Mynd 108: Tákn fyrir 4 × 4 gisturblokk (register file).*
+
+Hönnum rásina sem ákveður hvaða gistur er virkt. Sannleikstafla hennar lítur svona út:
+
+| Gistur | $\overline{E}$ | $A_{1}$ | $A_{0}$ | $O_{0}$ | $O_{1}$ | $O_{2}$ | $O_{3}$ |
+|:--|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+| **Gistur 0** | 0 | 0 | 0 | 1 | 0 | 0 | 0 |
+| **Gistur 1** | 0 | 0 | 1 | 0 | 1 | 0 | 0 |
+| **Gistur 2** | 0 | 1 | 0 | 0 | 0 | 1 | 0 |
+| **Gistur 3** | 0 | 1 | 1 | 0 | 0 | 0 | 1 |
+| **Ekkert** | 1 | x | x | 0 | 0 | 0 | 0 |
+
+$$
+O_{0} = \overline{\overline{E}}\cdot\overline{A_{1}}\cdot\overline{A_{0}} \qquad
+O_{1} = \overline{\overline{E}}\cdot\overline{A_{1}}\cdot A_{0} \qquad
+O_{2} = \overline{\overline{E}}\cdot A_{1}\cdot\overline{A_{0}} \qquad
+O_{3} = \overline{\overline{E}}\cdot A_{1}\cdot A_{0}
+$$
+
+![Mynd 109](myndir/mynd-109.png)
+
+*Mynd 109: „1 af 4“-rás (afkóðari).*
+
+![Mynd 110](myndir/mynd-110.png)
+
+*Mynd 110: Uppsetning úr Electronics Workbench.*
+
+### 6.4 Rað inn / rað út gistur
+
+Skoðum þessa rás:
+
+![Mynd 111](myndir/mynd-111.png)
+
+*Mynd 111: 4 bita rað inn / rað út gistur.*
+
+Sjáum að vippurnar eru raðtengdar, þ.e. útgangur vippu nr. $n$ tengist inngangi vippu nr. $n-1$. Skoðum hvað þarf til þess að koma stöðunni **1101** inn í svona gistur. Við viljum enda með **1** á $Q_{0}$, **0** á $Q_{1}$, **1** á $Q_{2}$ og **1** á $Q_{3}$.
+
+| ![Mynd 112](myndir/mynd-112.png) |
+|:-:|
+| Mynd 112: Upphafsstaða **0000**; staðan eftir 1 klukkupúls: **1000**. |
+| ![Mynd 113](myndir/mynd-113.png) |
+| Mynd 113: Staðan eftir 2 klukkupúlsa: **0100**; staðan eftir 3 klukkupúlsa: **1010**. |
+| ![Mynd 114](myndir/mynd-114.png) |
+| Mynd 114: Staðan eftir 4 klukkupúlsa: **1101**; lokastaða: **1101**. |
+
+Það þurfti fjóra klukkupúlsa til þess að lesa inn 4 bita tölu í stað eins klukkupúls áður. Gistrið tekur inn nýja tölu með því að lesa inn bitana frá vinstri til hægri (*shift right register*).
+
+En það er vandamál sem þarf að skoða, en það er sú staðreynd að útgangar eru tengdir við innganga. Kemur ekki upp sú staða að sama línan vilji vera bæði 0 og 1 á sama tíma?
+
+![Mynd 115](myndir/mynd-115.png)
+
+*Mynd 115: Útgangur einnar vippu tengdur við inngang þeirrar næstu.*
+
+**Hvaða stöðu sér vippan þegar klukkupúlsinn kemur, 0 eða 1?**
+
+![Mynd 116](myndir/mynd-116.png)
+
+*Mynd 116: Hvort svarið er rétt, $Q_{C}$ eða $Q_{W}$?*
+
+Hvort svarið er rétt, $Q_{C}$ eða $Q_{W}$? Þegar púlsinn kom við tímann $t_{1}$ var staðan á D = 0. En við $t_{2}$ er hún orðin 1 og vippan skiptir þá úr 0 í 1. $Q_{C}$ er því rétta svarið.
+
+Einfaldasta svarið er að vippan sér stöðuna á D-innganginum áður en klukkupúlsinn kom. Sú staða er flutt yfir á útganginn við tímann $t_{1}$. D-vippan seinkar því öllum gögnum um einn klukkupúls en heldur réttu bylgjuformi á gögnunum.
+
+![Mynd 117](myndir/mynd-117.png)
+
+*Mynd 117: D-vippan seinkar gögnunum um einn klukkupúls.*
+
+![Mynd 118](myndir/mynd-118.png)
+
+*Mynd 118: Uppsetningartími, haldtími og seinkun.*
+
+> $t_{s} = 100\,\mathrm{ns}$ (uppsetningartími, *setup time*)\
+> $t_{h} = 60\,\mathrm{ns}$ (haldtími, *hold time*)\
+> $t_{p} = 200$–$400\,\mathrm{ns}$ (flutningsseinkun, *propagation delay*) (dæmigerð gildi)
+
+Gögnin verða að vera tilbúin tímanum $t_{s}$ áður en klukkupúlsinn skiptir í hástöðu og haldast tímann $t_{h}$ eftir að klukkupúlsinn skipti í hástöðu. Seinkunartíminn frá D til Q er $t_{p}$.
+
+![Mynd 119](myndir/mynd-119.png)
+
+*Mynd 119: CD4031, 64 bita rað inn / rað út hliðrunargistur.*
+
+### 6.5 Jöfnunarbiti (*parity*)
+
+Til þess að tryggja að gögn skili sér rétt á áfangastað í raðsamskiptum er sendur einn aukabiti með gögnunum, svokallaður jöfnunarbiti (*parity bit*). Möguleikarnir eru tveir:
+
+1. Sent er með sléttri jöfnun (*even parity*). Þá er heildarfjöldi þeirra **1** sem send eru slétt tala. Ef við viljum t.d. senda gögnin **1101** með *even parity* verður jöfnunarbitinn að vera **1** til þess að gera fjöldann af **1** að sléttri tölu. Gögnin verða því **1**1101 þar sem fremsti bitinn er jöfnunarbitinn.
+2. Sent er með oddri jöfnun (*odd parity*). Þá er heildarfjöldi þeirra **1** sem send eru oddatala. Ef við sendum gögnin **1101** með *odd parity* er jöfnunarbitinn **0** því það er oddatölufjöldi af **1** í gögnunum. Gögnin verða því **0**1101.
+
+Á móttökuenda er síðan skoðað hvort gögnin hafi skilað sér rétt. Ef svo er ekki er send beiðni til baka til sendanda og hann beðinn um að senda þau aftur. Gallinn við jöfnunarbita er sá að ef tveir bitar breytast á leiðinni skynjar móttökuendinn það ekki sem villu. Í dag eru notaðar öflugri stærðfræðilegar aðferðir til þess að villuleita samskipti.
+
+Hvernig verður jöfnunarbitinn til? Ef við köllum *even parity*-bitann $P_{e}$ og *odd parity*-bitann $P_{o}$ er ljóst að $P_{o} = \overline{P_{e}}$.
+
+| Fjöldi af 1 | $D_{3}$ | $D_{2}$ | $D_{1}$ | $D_{0}$ | $P_{e}$ |
+|:-:|:-:|:-:|:-:|:-:|:-:|
+| 0 | 0 | 0 | 0 | 0 | **0** |
+| 1 | 0 | 0 | 0 | 1 | **1** |
+| 1 | 0 | 0 | 1 | 0 | **1** |
+| 2 | 0 | 0 | 1 | 1 | **0** |
+| 1 | 0 | 1 | 0 | 0 | **1** |
+| 2 | 0 | 1 | 0 | 1 | **0** |
+| 2 | 0 | 1 | 1 | 0 | **0** |
+| 3 | 0 | 1 | 1 | 1 | **1** |
+| 1 | 1 | 0 | 0 | 0 | **1** |
+| 2 | 1 | 0 | 0 | 1 | **0** |
+| 2 | 1 | 0 | 1 | 0 | **0** |
+| 3 | 1 | 0 | 1 | 1 | **1** |
+| 2 | 1 | 1 | 0 | 0 | **0** |
+| 3 | 1 | 1 | 0 | 1 | **1** |
+| 3 | 1 | 1 | 1 | 0 | **1** |
+| 4 | 1 | 1 | 1 | 1 | **0** |
+
+Ef við setjum niðurstöðuna í K-kort fæst:
+
+| | $\overline{D_{1}}\,\overline{D_{0}}$ | $\overline{D_{1}}D_{0}$ | $D_{1}D_{0}$ | $D_{1}\overline{D_{0}}$ |
+|:-:|:-:|:-:|:-:|:-:|
+| $\overline{D_{3}}\,\overline{D_{2}}$ | 0 | 1 | 0 | 1 |
+| $\overline{D_{3}}D_{2}$ | 1 | 0 | 1 | 0 |
+| $D_{3}D_{2}$ | 0 | 1 | 0 | 1 |
+| $D_{3}\overline{D_{2}}$ | 1 | 0 | 1 | 0 |
+
+Við getum ekkert lykkjað saman. Útkoman verður (eftir mikla Boole-algebru ☺):
+
+$$
+P_{e} = (D_{1} \oplus D_{0}) \oplus (D_{3} \oplus D_{2})
+$$
+
+Jöfnunarrásin lítur þá svona út (4 bita *parity generator*):
+
+![Mynd 120](myndir/mynd-120.png)
+
+*Mynd 120: 4 bita jöfnunarbitarás (parity generator).*
+
+![Mynd 121](myndir/mynd-121.png)
+
+*Mynd 121: Uppsetning í Workbench. Raðsamskipti með even parity. Staðan **1011** skrifuð inn með even parity-bitanum **1** og flutt yfir í annað gistur á móttökuenda þar sem jöfnunin er könnuð.*
+
+![Mynd 122](myndir/mynd-122.png)
+
+*Mynd 122: Odd parity-gaumljós á móttökuenda sýnir okkur að talan sem var flutt hafði oddatölufjölda af 1 og þess vegna var even parity-bitinn **1**.*
+
+![Mynd 123](myndir/mynd-123.png)
+
+*Mynd 123: Hér var sett inn bilun þannig að bitanum $D_{1}$, sem átti að vera **1**, var breytt í **0**. Þá skilar staðan **1001** sér á áfangastað í stað **1011** og við fáum ekki grænt OK-ljós á móttökuenda.*
+
+## 7. Minni
+
+Minni má skipta í tvo flokka:
+
+**A.** Hraðvirkt vinnsluminni, **RAM**, og hraðvirkt lesminni, **ROM**.\
+**B.** Geymsluminni, stórt og hægvirkt, t.d. harðir diskar, geisladiskar og segulbönd.
+
+**RAM**-minni (*Random Access Memory*) er minni sem hægt er að lesa úr og skrifa í í rauntíma (meðan tölvan vinnur). Þess vegna er vinnsluminni í tölvu alltaf RAM. Stundum er þó búið til sýndarminni (*virtual memory*) á harða diskinum.
+
+Ein minniseining (*cell*) getur geymt einn bita, **0** eða **1**. Ein röð getur geymt eina tölu (*word*, orð). Þessi tala er yfirleitt 8 bitar (1 bæti), 16 bitar, 32 bitar eða 64 bitar. Alltaf er ein röð (tala) lesin inn eða út í einu.
+
+4 × 4 minni gæti litið svona út:
+
+| Vistfang | | | | |
+|:-:|:-:|:-:|:-:|:-:|
+| **0** | 0 | 1 | 1 | 0 |
+| **1** | 1 | 1 | 1 | 0 |
+| **2** | 0 | 1 | 0 | 1 |
+| **3** | 1 | 1 | 1 | 1 |
+
+Hægt er að skipta um fjóra bita (eina röð) í einu. Minni sem er 1024 × 8 geymir 1024 bæti eða 1 KB. Til þess að geta farið inn í hvaða röð sem er þarf 1024 vistföng (*addresses*) eða 10 bita (línu) vistfangsbraut (*address bus*) því $2^{10} = 1024$. Í minninu á myndinni að ofan þarf 2 línu vistfangsbraut því við erum með fjögur vistföng og $2^{2} = 4$.
+
+> **Athugið:**\
+> $1024 = 1\,\mathrm{K}$, $1024\cdot 1024 = 1\,048\,576 = 1\,\mathrm{M}$ og $1024\cdot 1024\cdot 1024 = 1\,073\,741\,824 = 1\,\mathrm{G}$.\
+> Veldi af 2 passa ekki nákvæmlega við veldi af 10 (t.d. er $2^{10} = 1024$ en ekki 1000). Þess vegna kemur þessi skekkja fram.
+
+Minnið á myndinni hér að framan er einvítt, þ.e. línur. Einnig er hægt að skipuleggja minni í tvívídd, þ.e. línur og dálka, og í þrívídd, þ.e. línur, dálka og plön.
+
+| Lína \\ dálkur | **11** | **10** | **01** | **00** |
+|:-:|:-:|:-:|:-:|:-:|
+| **00** | 3 | 2 | 1 | 0 |
+| **01** | 7 | 6 | 5 | 4 |
+| **10** | B | A | 9 | 8 |
+| **11** | F | E | D | C |
+
+Til þess að breyta bitanum í hólfi D er staðan **1101** sett á vistfangsbrautina. Tveir fyrstu bitarnir eru línan og seinni tveir eru dálkurinn. Þetta minni geymir 16 bita eða 2 bæti.
+
+Ef við viljum að hvert vistfang geymi meira en einn bita búum við til plön og förum í þrívídd. Átta bita tala, 1 bæti, er þá geymd í átta plönum.
+
+![Mynd 124](myndir/mynd-124.png)
+
+*Mynd 124: Þrívítt minni með fjórum plönum.*
+
+Í þessu minni er 4 bita talan 1101 geymd í vistfangi 0000 á fjórum plönum. Minnið geymir 16 × 4 bita eða samtals 8 bæti.
+
+![Mynd 125](myndir/mynd-125.png)
+
+*Mynd 125: Þetta minni geymir 256 ($2^{8}$) 16 bita tölur á 16 plönum, eða samtals 512 bæti.*
+
+**Sóknartími (*access time*)**
+
+Sóknartími er sá tími sem líður frá því að vistfangið kemur á vistfangsbrautina þar til innihald minnishólfsins er komið á gagnabrautina. Þessi tími er fastur fyrir þrívítt minni og yfirleitt mældur í ns. Þegar við getum farið inn í hvaða vistfang sem er í minninu og lesið út eða skrifað inn á föstum tíma er það kallað „random accessing“.
+
+### 7.1 Högun minnis
+
+**FIFO (*First In First Out*)**
+
+FIFO-minni eru kvik, þ.e. gögnin eru á hreyfingu innan þeirra.
+
+![Mynd 126](myndir/mynd-126.png)
+
+![Mynd 127](myndir/mynd-127.png)
+
+*Mynd 126 og 127: FIFO-minni.*
+
+FIFO-minni eru byggð upp sem hliðrunargistur (*shift register*). Inngangur þeirra er samhliða gistur (*parallel register*) sem geymir næstu stöðu sem lesa á inn. Útgangurinn er líka samhliða gistur sem geymir síðustu stöðu sem lesin var út. Ef minnið er fullt og við þurfum að bæta við tölu er elstu tölunni ýtt út (*push*). FIFO-minni er t.d. notað sem biðminni (*buffer*) fyrir prentara.
+
+**LIFO (*Last In First Out*)**
+
+LIFO-minni er byggt upp sem tvístefnugistur, þ.e. það hefur sameiginlegt inn- og útgangsstig. Þess vegna er síðasta tala inn fyrst út.
+
+![Mynd 128](myndir/mynd-128.png)
+
+![Mynd 129](myndir/mynd-129.png)
+
+*Mynd 128 og 129: LIFO-minni.*
+
+Ef LIFO-minni yfirfyllist týnast neðstu tölurnar („út um botninn“, *bit bucket*). Því verður að fylgjast vel með hve mikið er komið í minnið (vandamál forritara).
+
+**R/W-minni**
+
+R/W-minni er samheiti yfir minni sem hægt er að skrifa í og lesa úr á meðan forrit keyrir. Undir þetta flokkast bæði FIFO og LIFO. En R/W-minni eru samt ekki RAM-minni í strangasta skilningi því í RAM-nafninu felst „random access“-tæknin, þ.e. að sóknartíminn sé fastur fyrir gögn hvar sem þau eru í minninu. Það gildir ekki fyrir FIFO og LIFO. Þau eru samt kölluð RAM-minni þótt það sé ekki „rétt“.
+
+**Óstöðugleiki minnis (*memory volatility*)**
+
+Minni sem tapa innihaldi sínu við rafmagnsleysi eru kölluð hvikul (*volatile*). Minni sem halda innihaldi sínu við rafmagnsleysi kallast óhvikul (*non-volatile*). Hægt er að gera RAM-minni óhvikult með því að nota rafhlöðu. Það er t.d. gert á móðurborðum tölva til þess að viðhalda innihaldi CMOS-minnisins sem geymir stillingar BIOS tölvunnar.
+
+Minni sem heldur innihaldi sínu svo lengi sem rafmagn er til staðar kallast stöðugt (*static*). Þetta eru svokölluð SRAM-minni (*Static RAM*).
+
+Til eru RAM-minni sem eru ekki stöðug þótt þau hafi rafmagn. Þetta eru svokölluð kvik minni (*Dynamic RAM* eða DRAM). Þau eru hraðvirk og ódýr en gallinn við þau er að þau þurfa að fá „hressingu“ (*refresh*) reglulega, a.m.k. á 64 ms fresti, til þess að viðhalda innihaldi sínu. Hver minniseining er örsmár þéttir sem heldur hleðslu sinni aðeins í stutta stund.
+
+### 7.2 SRAM (*Static Random Access Memory*)
+
+**Static random access memory** (SRAM) er hálfleiðaraminni þar sem orðið „static“ (stöðugt) vísar til þess að ekki þarf að endurnýja (*refresh*) innihald þess reglulega eins og í DRAM-minni. SRAM notar vippur (*bistable latching*) til þess að geyma hvern bita. SRAM-minni eru hvikul (*volatile*) sem þýðir að þau glata innihaldi sínu við straumleysi.
+
+**Hugtakið SDRAM, sem stendur fyrir „synchronous DRAM“, hefur ekkert með SRAM að gera en þessu tvennu er oft ruglað saman.**
+
+**Hönnun**
+
+![Mynd 130](myndir/mynd-130.png)
+
+*Mynd 130: Sex-transistora CMOS SRAM-minnissella.*
+
+Hver biti í SRAM er geymdur í fjórum transistorum (M1–M4) sem mynda tvo krosstengda invertera (Q og $\overline{Q}$). Þessi geymslueining hefur tvær stöður sem við köllum **0** og **1**. Síðan eru tveir aukatransistorar (M5 og M6) sem eru notaðir við innskrift og útlestur. Til eru SRAM-sellur með fleiri transistorum sem gera þeim kleift að vinna með fleiri inn- og útganga í einu (*multi-port*). Til þess að ná sambandi við minnisröðina (orðið) er WL-inngangurinn (*word line*) notaður. Hann stýrir transistorunum M5 og M6 sem tengja eininguna við BL- og $\overline{\mathrm{BL}}$-línurnar (*bit lines*). Þær eru notaðar til þess að flytja gögn bæði við skrift og lestur. Þó að í rauninni sé óþarfi að nota $\overline{\mathrm{BL}}$-línuna er það yfirleitt gert til þess að minnka suð með því að nota balanseruð samskipti.
+
+Þetta eykur bandvídd samskiptanna miðað við DRAM því balanseruð samskipti eru lítt næm fyrir suði. Einnig gerir tilkoma transistoranna kleift að dæla út meiri straumi en í DRAM-minni.
+
+Stærð SRAM-minnis með $m$ vistfangalínum og $n$ gagnalínum er $2^{m}$ orð (*words*), eða $2^{m}\cdot n$ bitar.
+
+> **Athugið:** Orð (*word*) þýðir nokkrir bitar. 8 bita orð er sama og 1 bæti. Algengar stærðir eru 8 bita orð, 16 bita orð, 32 bita orð og 64 bita orð.
+
+SRAM með 16 vistfangalínum og 32 gagnalínum (32 línu gagnabraut) geymir því $2^{16} = 65\,536$ orð. Í bitafjölda er þetta $65\,536\cdot 32 = 2\,097\,152$ bitar ($2\,\mathrm{Mb}$, eða $262\,144$ bæti $= 256\,\mathrm{KB}$).
+
+**Virkni SRAM**
+
+SRAM-minniseining hefur þrjár stöður: biðstöðu (*standby*), útlestur (*reading*) og innskrift (*writing*).
+
+**Biðstaða (*standby*).** Ef orðlínan er spennulaus aftengja M5 og M6 eininguna frá gagnabrautinni. M1 til M4 halda innihaldi sínu á meðan spenna er á rásinni.
+
+**Útlestur.** Gerum ráð fyrir að innihald minnissellunnar sé **1** og geymt á Q-útgangi. Útlestrarferlið hefst á því að báðar bitalínurnar eru settar í hástöðu **1**. Síðan er WL-línan gerð virk þannig að bæði M5 og M6 leiða (ON). Næst er gildið **1** (Q og $\overline{Q}$) flutt yfir á bitalínurnar þannig að BL helst í hástöðu og $\overline{\mathrm{BL}}$ fer í lágstöðu. Það gerist með því að $\overline{\mathrm{BL}}$ afhleðst til jarðar í gegnum M1 og M5 en BL tengist $V_{DD}$ (rökleg **1**) í gegnum M4 og M6. Ef innihald einingarinnar hefði verið **0** gerðist akkúrat öfugt, þ.e. BL afhlæðist en $\overline{\mathrm{BL}}$ héldist í hástöðu.
+
+![Mynd 131](myndir/mynd-131.png)
+
+*Mynd 131: Útlestur. 1. $WL = 0$, $BL = \overline{BL} = 1$. 2. $WL = 1$, $\overline{BL} = 0$, $BL = 1$.*
+
+**Innskrift.** Innskriftarferlið hefst á því að bitarnir sem skrifa á inn eru settir á bitalínurnar. Ef við viljum skrifa inn **0** setjum við **0** á BL-línuna og **1** á $\overline{\mathrm{BL}}$-línuna. Síðan er WL-línan gerð virk og bitarnir skrifaðir inn. Ef við ætlum að skrifa inn **1** setjum við **1** á BL og **0** á $\overline{\mathrm{BL}}$. Inngangstransistorarnir (M5 og M6) eru miklu sterkari en geymslutransistorarnir (M1–M4) og geta því auðveldlega þvingað inn nýja stöðu.
+
+![Mynd 132](myndir/mynd-132.png)
+
+*Mynd 132: Innskrift. 1. $BL = 0$, $\overline{BL} = 1$. 2. $WL = 1$ og stöðurnar skrifaðar inn.*
+
+**Hegðun brautar**
+
+RAM-minni með sóknartíma (*access time*) 70 ns skilar af sér gögnum í síðasta lagi 70 ns eftir að vistfangsbrautin (*address bus*) varð virk. Gögnin eru líka aðgengileg í smástund, 5–10 ns (*hold time*), eftir að þau voru lesin út eða skrifuð inn.
+
+SRAM er miklu dýrara og hraðvirkara en DRAM og eyðir minna afli í biðstöðu. Það er því mest notað þar sem þörf er á mikilli bandvídd eða lítilli aflnotkun. T.d. er flýtiminni (*cache*) örgjörva alltaf SRAM. Auðveldara er að stýra SRAM-minni en DRAM og SRAM er meira „random access“-minni en DRAM. DRAM-minnið er hins vegar miklu ódýrara og því mest notað sem vinnsluminni í tölvum í dag.
+
+### 7.3 ROM-minni (*Read Only Memory*)
+
+Til eru fjórar gerðir af ROM-minni:
+
+1. Grímuforritað ROM (*Mask ROM*, MROM)
+2. Bræðitengja-ROM (*PROM, fuse link*)
+3. ROM hreinsanlegt með útfjólubláu ljósi (EPROM)
+4. ROM breytanlegt með rafmagni (EEPROM eða E²PROM)
+
+**1. Mask ROM** er forritað með filmugrímu í framleiðslu og er óbreytanlegt. Framleiðslan getur tekið vikur og þetta er í raun úrelt tækni.
+
+**2. PROM** er hægt að forrita með forritunartæki, svokölluðum PROM-forritara (*PROM programmer*). PROM kemur frá verksmiðjunni með öll bræðitengi heil, þ.e. sama gildi (yfirleitt 1) í öllum minniseiningum. Til þess að breyta gildi minniseiningar er sendur straumur á réttan stað í rásinni til þess að bræða tenginguna. Þessi aðgerð er endanleg og rásin ónýt ef hún mistekst.
+
+**3. EPROM** er minni sem hægt er að hreinsa með útfjólubláu ljósi og endurforrita. EPROM er forritað með EPROM-forritara þar sem forritið er flutt frá PC-tölvu yfir í forritunartækið. EPROM-minni má auðveldlega þekkja á glugganum ofan á því. Þegar búið er að forrita verður að hylja þennan glugga með ógagnsæju efni, t.d. límmiða.
+
+**4. EEPROM** er ROM-minni sem hægt er að breyta á meðan unnið er í tölvunni. Það er þó of hægvirkt til þess að geta kallast RAM. Til eru minni (NVSRAM) sem byggð eru upp sem tvö lög: efra lagið er venjulegt R/W-minni (SRAM) en neðra lagið hægvirkt EEPROM. Ef örgjörvinn skynjar rafmagnsvandræði getur hann skipað svo fyrir að efra lagið sé afritað í neðra lagið og geymt þar sem afrit. Hægt er að afrita í báðar áttir. BIOS er geymt í EEPROM-minni (Flash). Flash-minni er sérstök gerð af EEPROM.
+
+**Lestur úr og ritun í minni**
+
+Til þess að lesa úr og skrifa í minni þarf þrennt að gerast:
+
+1. Finna þarf vistfang minnishólfsins og koma því á vistfangsbrautina.
+2. Ákveða þarf hvort lesa á út eða skrifa inn.
+3. Stýra þarf nákvæmlega hvenær þetta á að gerast.
+
+Örgjörvinn stýrir þessum atburðum. Hann sendir fyrst vistfangið á vistfangsbrautina. Minnið inniheldur vistfangsafkóðara (*address decoder*) sem sér um aðgang að réttum minniseiningum. Stuttu síðar sendir örgjörvinn annaðhvort *Read*- eða *Write*-skipun og lesið er út á gagnabrautina eða skrifað inn af gagnabrautinni. Örgjörvinn sér síðan um að koma upplýsingunum af gagnabrautinni á rétta staði. Hann getur t.d. sent þær út á prentara eða skjá, eða tekið þær inn í reikningseininguna (ALU) og framkvæmt einhverja útreikninga á þeim.
+
+**Notkun minnis**
+
+Í tölvum eru fimm gerðir af minni:
+
+1. Flýtiminni (*scratch pad memory*)
+2. Biðminni (*buffer*)
+3. Staflaminni (*stack*)
+4. Raðminni (*queue*)
+5. Uppflettiminni (*look-up table*)
+
+**1. Flýtiminni** (*scratch pad*) er lítið minni sem notað er til þess að geyma gögn í stuttan tíma, t.d. í reiknivélum. Öll vinnsla í reiknivélum fer fram í flýtiminni en hægt er að geyma niðurstöðurnar í öðru minni. Í PC-tölvum er þetta minni yfirleitt innbyggt í örgjörvann sem skyndiminni (*cache*). Reiknieiningin (ALU) notar flýtiminni til þess að geyma þær tölur sem hún er að nota í útreikningum. Flýtiminnið er, eins og nafnið bendir til, hraðvirkara en venjulegt vinnsluminni. Það er líka miklu dýrara og því framleitt frekar lítið, oft á bilinu nokkur hundruð KB til nokkurra MB. Vegna þess að flýtiminnið er innbyggt í örgjörvann teppir það engar brautir svo að tölvan getur unnið í flýtiminninu samhliða því sem hún framkvæmir eitthvað annað á móðurborðinu.
+
+**2. Biðminni** (*buffer*) virkar sem stuðpúði á milli hraðvirks örgjörva og hægvirks jaðartækis, t.d. prentara. Biðminni er nær undantekningarlaust FIFO. Þannig getur örgjörvinn fyllt öðru hverju á biðminnið og haldið síðan áfram við annað. Prentarinn mjatlar síðan úr biðminninu á sínum hraða en teppir ekki vinnu örgjörvans.
+
+**3. Staflaminni** (*stack*) er frátekinn hluti af vinnsluminni tölvunnar. Örgjörvinn notar staflann til þess að geyma öll gögn sem hann er að vinna með ef hann fær beiðni (rof) um að gera eitthvað annað strax (*Interrupt Request*, IRQ). Þetta er nær undantekningarlaust LIFO-minni því það hentar vel að síðasta skipun sem fer inn sé sú sem þarf að framkvæma fyrst eftir að rofinu er lokið. Í staflann fer líka afrit af innihaldi flýtiminnisins svo að það glatist ekki. Til þess að fylgjast með stærð staflans er notaður svokallaður staflabendir (*stack pointer*). Til þess að fylgjast með vistföngum vinnsluminnisins er notaður svokallaður forritsteljari (*program counter*). Ef vistfangsbrautin er 32 bitar þurfa staflabendirinn og forritsteljarinn báðir að vera 32 bita.
+
+Skoðum hvað gerist þegar örgjörvinn fær skipun um að hætta í forriti til þess að sinna jaðartæki. Gerum ráð fyrir að staflinn sé hluti af vinnsluminninu en settur upp eins og LIFO. Segjum að forritsteljarinn sé staddur í vistfangi $\mathrm{0500}_{H}$ og staflabendirinn bendi á $\mathrm{FFFF}_{H}$ (16 bita vistfangsbraut). Örgjörvinn er þá að ná í skipun úr minnishólfi $\mathrm{0500}_{H}$ ($1280_{10}$) og staflabendirinn bendir á næsta lausa minnishólf sem er efst á staflanum. Örgjörvinn klárar að framkvæma skipunina úr $\mathrm{0500}_{H}$, hækkar síðan forritsteljarann um 1 ($\mathrm{0501}_{H}$) og flytur það gildi í staflann. Síðan flytur hann allt úr flýtiminninu í staflann. Þegar hann er búinn að afgreiða rofið flytur hann innihaldið úr staflanum í flýtiminnið og síðan gildi næsta vistfangs ($\mathrm{0501}_{H}$) inn í forritsteljarann og getur þá haldið áfram að framkvæma næstu skipun í forritinu sem hann var að vinna í fyrir rofið.
+
+**4. Raðminni** (*queue*). Örgjörvinn færir allar skipanir sem framkvæma á inn í biðminni þaðan sem þær eru lesnar ein og ein inn í skipanagistrið (*Instruction Register*, IR). Hann fyllir á minnið eftir þörfum og getur notað lausan tíma til þess að framkvæma skipanir innan örgjörvans sem ekki útheimta notkun á vistfanga- eða gagnabrautinni.
+
+**5. Uppflettiminni** (*look-up table memory*) er minni sem hefur fast innihald og við getum litið á sem uppflettitöflu. Ef við myndum t.d. brenna sannleikstöflu einhverrar rökrásar með 4 inngöngum myndi minnið geyma $2^{4}$ uppflettilínur þar sem hver lína geymdi stöðu útganganna fyrir þá línu. Dæmi um þetta væri t.d. sjö ráka afkóðunarrás sem hefði þá 4 innganga og 7 útganga. Inngangurinn **0000** gæfi okkur þá útganginn **1111110** sem myndar töluna **0** á skjánum.
+
+### 7.4 DRAM (*Dynamic Random Access Memory*)
+
+DRAM geymir hvern bita í litlum þétti. Vegna þess að þéttar hafa tilhneigingu til að missa hleðslu (leka) þarf reglulega að hressa upp á hleðsluna. Það fer þannig fram að sömu gögnin eru skrifuð inn aftur reglulega án breytinga. *Dynamic*-hluti nafnsins vísar til þessa: minnið er stöðugt endurskrifað aftur og aftur.
+
+Kostur DRAM er einfaldleikinn í uppbyggingunni. Aðeins þarf einn transistor og einn þétti til að geyma einn bita í stað sex transistora í SRAM. Þetta þýðir að DRAM-minni geta orðið mjög stór og þau eru í reynd mest notuðu vinnsluminnin í dag.
+
+![Mynd 133](myndir/mynd-133.png)
+
+*Mynd 133: Uppbygging DRAM-minnis.*
+
+**Virkni**
+
+DRAM er venjulega sett upp sem ferningslaga fylki (tafla) með einn transistor og einn þétti í hverri minniseiningu. Á myndinni hér að framan er dæmi um 4 × 4 fylki (16 bitar) en í raunveruleikanum erum við kannski með þúsundir eininga í röðum og dálkum.
+
+Langa línan sem tengir einingarnar í hverri röð kallast WL (*word line*). Hver dálkur hefur venjulega tvær bitalínur (BL og $\overline{\mathrm{BL}}$) en til einföldunar er bara BL sýnd. Þær eru venjulega kallaðar + og − bitalínan. Þetta er gert til þess að halda minninu stöðugu með jákvæðri afturverkun (*positive feedback*).
+
+Venjulega gera framleiðendur ráð fyrir að minnið sé hresst við með að minnsta kosti 64 ms millibili. Þetta gerir rásina flóknari (útheimtir *refresh logic*) en er samt miklu ódýrara en að nota SRAM. Sumar DRAM-tegundir hressa allt minnið í einu á 64 ms fresti en aðrar taka eina röð í einu. Sem dæmi má taka minni með $2^{13} = 8192$ raðir. Þá er hver röð hresst við á $7{,}8\,\mu\mathrm{s}$ fresti ($64\,\mathrm{ms}/8192$).
+
+**Tímar**
+
+| | PC-3200 (DDR-400) dæmigert | hratt | PC2-6400 (DDR2-800) dæmigert | hratt | PC3-12800 (DDR3-1600) dæmigert | hratt |
+|:--|:-:|:-:|:-:|:-:|:-:|:-:|
+| $t_{CL}$ | 3 (15 ns) | 2 (10 ns) | 5 (12,5 ns) | 4 (10 ns) | 9 (11,25 ns) | 8 (10 ns) |
+| $t_{RCD}$ | 4 (20 ns) | 2 (10 ns) | 5 (12,5 ns) | 4 (10 ns) | 9 (11,25 ns) | 8 (10 ns) |
+| $t_{RP}$ | 4 (20 ns) | 2 (10 ns) | 5 (12,5 ns) | 4 (10 ns) | 9 (11,25 ns) | 8 (10 ns) |
+| $t_{RAS}$ | 8 (40 ns) | 5 (25 ns) | 16 (40 ns) | 12 (30 ns) | 27 (33,75 ns) | 24 (30 ns) |
+
+*Gildin eru gefin sem fjöldi klukkupúlsa (tími í sviga).*
+
+Þessi tafla spannar nokkurra ára tímabil og framfarirnar í biðtímum eru ekki stórkostlegar. Þó má benda á að DDR3-tæknin hefur 32 sinnum meiri bandvídd en eldra EDO-minni og getur sent út tvö orð á hverjum 1,25 ns klukkupúlsi (1600 Mword/s) á meðan EDO RAM getur skilað af sér einu orði á 20 ns (50 Mword/s).
+
+**Villur og villuleiðréttingar**
+
+Raf- og segultruflanir innan tölvu geta valdið því að einn biti í DRAM-minni skipti úr réttri stöðu í andhverfa stöðu. Þetta er vegna þess að DRAM-minnin eru að minnka að ummáli, meira af gögnum er troðið í þau og vinnsluspennan lækkuð. Það þýðir að lágorkuagnir geta breytt innihaldi einnar eða fleiri minniseininga.
+
+Þetta vandamál má leysa með því að nota t.d. jöfnunarbita og/eða villuleiðréttingu (*Error Correcting Code*, **ECC**). Gallinn við jöfnunarbita er að hann skynjar bara breytingu á einum (eða oddatölufjölda) bita. Algengasta villuleiðréttingin er að nota Hamming-kóða. Hann getur leiðrétt einn rangan bita og, ef hann er notaður með jöfnunarbita, fundið út hvort villa er í tveimur bitum í sama orði.
+
+Ekki styðja öll móðurborð villuleiðréttingu. Hún er fyrst og fremst notuð í dýrum og mikilvægum tölvum eins og þjónum. Sum móðurborð hafa þá tækni að BIOS þeirra lærir að þekkja veilur í minni og forðast að nota þær raðir.
+
+Ástæðurnar fyrir því að nota ekki villuleiðréttingu (ECC) eru:
+
+- Aukajöfnunarbiti í hverju bæti eykur kostnað um 1/8 (12,5 %), þ.e. 9 bitar í stað 8. Í harðri verðsamkeppni er það mikið.
+- Móðurborð sem styðja ECC eru dýrari.
+- ECC hefur þau áhrif að erfiðara er að yfirklukka örgjörvann.
+- ECC-minnisrás þarf aukatíma til þess að framkvæma villuleiðréttinguna, sem getur þýtt töf upp á 0,5 % til 2 %.
+
+Nýlegar rannsóknir sýna að tíðni villna í minni er frá einum bita á klukkustund á hvert GB af minni til eins bita á öld á hvert GB af minni. Í öllum tölvum sem notaðar eru í vísindalegum og fjármálalegum tilgangi er reglan að nota ECC frekar en undantekning.
+
+**DRAM-pakkningar**
+
+| | |
+|:-:|:-:|
+| ![Mynd 134](myndir/mynd-134.png) | ![Mynd 135](myndir/mynd-135.png) |
+| Mynd 134: DIP, 16 pinna | Mynd 135: SIPP, 30 pinna |
+| ![Mynd 136](myndir/mynd-136.png) | ![Mynd 137](myndir/mynd-137.png) |
+| Mynd 136: SIMM, 30 pinna | Mynd 137: SIMM, 72 pinna |
+| ![Mynd 138](myndir/mynd-138.png) | ![Mynd 139](myndir/mynd-139.png) |
+| Mynd 138: SDRAM, 168 pinna DIMM | Mynd 139: DDR1, 184 pinna DIMM |
+| ![Mynd 140](myndir/mynd-140.png) | ![Mynd 141](myndir/mynd-141.png) |
+| Mynd 140: EDO RAM, 72 pinna (SIMM) | Mynd 141: RAMBUS, 184 pinna (RIMM) |
+| ![Mynd 142](myndir/mynd-142.png) | ![Mynd 143](myndir/mynd-143.png) |
+| Mynd 142: DDR2, 240 pinna DIMM | Mynd 143: DDR3, 240 pinna DIMM |
+
+DIP = *Dual Inline Package*, SIPP = *Single Inline Pin Package*, SIMM = *Single Inline Memory Module*, DIMM = *Dual Inline Memory Module*.
+
+**Ósamfasa DRAM (*asynchronous DRAM*)**
+
+Þetta er grundvallargerðin sem allar gerðir DRAM eru hannaðar út frá. Hún hefur yfirleitt 12 vistfangalínur og 4 tvístefndar gagnalínur. Einnig hefur hún fjóra *active low*-innganga:
+
+- $\overline{\mathrm{RAS}}$ kveikir á valinni röð. Röð er valin svo lengi sem $\overline{\mathrm{RAS}}$-inngangurinn er lágur.
+- $\overline{\mathrm{CAS}}$ kveikir á völdum dálki. Dálkur er valinn svo lengi sem $\overline{\mathrm{CAS}}$-inngangurinn er lágur.
+- $\overline{\mathrm{WE}}$ (*Write Enable*): Rásin skrifar inn gögn svo lengi sem $\overline{\mathrm{WE}}$ er lágur; þegar hann er hár eru gögn lesin út.
+- $\overline{\mathrm{OE}}$ (*Output Enable*): Aukainngangur sem stýrir aðgangi að I/O-pinnunum.
+
+**EDO RAM, *Extended Data Out* (EDO) DRAM**
+
+![Mynd 144](myndir/mynd-144.png)
+
+*Mynd 144: EDO DRAM-minnisrásir.*
+
+EDO DRAM er hannað þannig að hægt er að byrja að sækja ný gögn eða skrifa ný gögn inn um leið og fyrri gögn eru geymd í I/O-einingu.
+
+**Double Data Rate (DDR) SDRAM**
+
+DDR-minni kom á markað í byrjun ársins 2000. *Double*-hluti nafnsins þýðir að það vinnur bæði á forkanti og bakkanti klukkupúlsins.
+
+**DDR eða DDR1 (2000–2002)**
+
+Miðað við SDR SDRAM (*single data rate*) er DDR miklu hraðvirkara, bæði vegna betri gagnastýringar og vegna þess að það vinnur á báðum köntum klukkupúlsins. Miðað við sömu klukkutíðni er það því u.þ.b. tvisvar sinnum hraðvirkara. Hámarksflutningsgeta DDR1 er frá 1600 MB/s (DDR-200) upp í 3200 MB/s (DDR-400).
+
+DDR1-minni keyrir á 2,5 V miðað við 3,3 V á SDRAM. Hækkun á þessari spennu getur aukið hraðann en á kostnað meiri orkunotkunar og jafnvel hættu á skemmdum.
+
+Venjulegt DDR1-minni hefur 8 minnisrásir ($8\cdot 8 = 64$ bitar). Ef ECC er bætt við bætist níunda minnisrásin við.
+
+**DDR2 (2003–2004)**
+
+*Ávinningur fram yfir DDR1:* Hámarksflutningsgeta allt að 6400 MB/s (DDR2-800) á móti 3200 MB/s (DDR-400). DDR2 keyrir á 1,8 V miðað við 2,5 V hjá DDR1. DDR2 leyfir hærri brautarhraða með því að lækka innri klukkuhraða niður í helming brautarhraða. DDR2 hefur tvöfalt stærra forsóknarbiðminni (*prefetch buffer*) en DDR1.
+
+DDR2 er hvorki samhæft við DDR1 né DDR3.
+
+**DDR3 (2007–2008)**
+
+*Ávinningur fram yfir DDR2:* Gagnaflutningur er tvisvar sinnum hraðari en hjá DDR2. Flutningsgeta 64 bita DDR3-minnis er t.d. 12 800 MB/s fyrir DDR3-1600 (PC3-12800). DDR3 notar 30 % minna afl en DDR2. DDR3 keyrir á 1,35 V til 1,5 V á móti 1,8 V hjá DDR2. Minniskubbarnir eru jafnlangir og hafa jafnmarga pinna en hakið í tengibrúninni er á öðrum stað svo að sökklarnir eru ekki eins. DDR3 hefur tvöfalt stærra forsóknarbiðminni (*prefetch buffer*) en DDR2 sem flýtir fyrir inn- og útlestri.
+
+GDDR3 er stundum ruglað saman við DDR3 en það er sérstök útgáfa af DDR2 fyrir myndvinnslu.
+
+DDR3 er hvorki samhæft við DDR2 né DDR4.
+
+**DDR4 (2013–2014)**
+
+![Mynd 145](myndir/mynd-145.png)
+
+*Mynd 145: DDR4, 288 pinna DIMM. Sama lengd og DDR3, 240 pinna DIMM.*
+
+*Ávinningur fram yfir DDR3:* Þéttari pökkun á minniseiningum og þannig er hægt að búa til stærri minni, jafnvel tvöfalt stærri. DDR4 notar minna afl en DDR3 og er hraðvirkara. DDR4 keyrir á 1,2 V og býður upp á gagnahraða frá 1600 til 3200 MT/s. Lágspennu-DDR4 keyrir á 1,05 V.
+
+Netheimar halda því þó fram að DDR4 hafi ekkert stórkostlegt forskot á DDR3. Það henti aðallega stórum tölvuþjónum vegna aflsparnaðar. Byltingin úr DDR2 í DDR3 hafi verið miklu stærri.
+
+## 8. Forritun stýriörgjörva
+
+**Picaxe**
+
+Picaxe eru stýriörgjörvar sem mjög auðvelt er að forrita. Þeir eru góðir sem fyrsta val í stýriörgjörvum og forritin eru mjög gagnsæ. Fyrir lengra komna er hægt að fara í Arduino eða Raspberry Pi en þar er forritunarumhverfið flóknara.
+
+Picaxe-örgjörvinn er forritaður með forriti sem heitir *Picaxe Programming Editor* og hægt er að sækja ókeypis. Forritið er notað til þess að tengjast örgjörvanum en einnig er hægt að herma forritin í því og athuga hvort þau virka. Hægt er að kaupa mikið af tilbúnum búnaði frá Picaxe til að leika sér með, en einnig er hægt að útbúa eigin raðtengda upphalsrás og nota örgjörvann á eigin prentplötum.
+
+Sem dæmi um lítið forrit er t.d.:
+
+![Mynd 146](myndir/mynd-146.png)
+
+*Mynd 146: Forrit sem lætur útgang nr. 4 á Picaxe 8M2-örgjörvanum blikka.*
+
+Þetta forrit lætur útgang nr. 4 á Picaxe 8M2-örgjörvanum blikka: hann logar í 1 s og er slökktur í 1 s, þ.e. lotan er 2 s og tíðnin $0{,}5\,\mathrm{Hz}$.
+
+Fyrst veljum við *Syntax* til að kanna hvort forritið sé villulaust. Græni textinn eru athugasemdir sem eru ekki hluti af forritinu heldur hjálpartæki fyrir forritarann. Athugasemdir eru gerðar með því að slá inn ' á undan (' er á sama lykli og spurningarmerkið). Þá verður athugasemdatextinn grænn.
+
+Ef forritið er villulaust birtist gluggi með textanum *Success!*
+
+Næst hermum við forritið. Við smellum á hnappinn *Simulate* og þá birtist þessi mynd. Græna ljósið á útgangi 4 blikkar eins og til stóð (1 s kveikt, 1 s slökkt).
+
+![Mynd 147](myndir/mynd-147.png)
+
+*Mynd 147: Hermun forritsins í Picaxe Programming Editor.*
