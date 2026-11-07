@@ -1,0 +1,80 @@
+// Sjálfvirkt búið til úr Markdown-skjalinu með pandoc og _verkfaeri/rafbok.lua.
+// Breytið frekar .md-skránni og keyrið _verkfaeri/byggja.sh.
+
+#let titill = [$title$]
+#let undirtitill = [$if(subtitle)$$subtitle$$endif$]
+#let afangi = [$if(course)$$course$$endif$]
+#let hofundur = [$if(author)$$for(author)$$author$$sep$, $endfor$$endif$]
+#let utgafa = [$if(edition)$$edition$$endif$]
+
+#let blockquote(body) = block(
+  width: 100%, inset: (x: 12pt, y: 9pt), radius: 3pt,
+  fill: rgb("#eef4fb"), stroke: (left: 3pt + rgb("#2f6db5")),
+  body,
+)
+#let horizontalrule = line(start: (25%, 0%), end: (75%, 0%), stroke: 0.5pt + gray)
+
+#set document(title: titill, author: "$for(author)$$author$$sep$, $endfor$")
+#set text(lang: "is", font: ("Libertinus Serif", "New Computer Modern"), size: 11pt)
+#show math.equation: set text(font: ("New Computer Modern Math",))
+#set par(justify: true, leading: 0.62em)
+#set page(
+  paper: "a4",
+  margin: (x: 2.5cm, top: 2.6cm, bottom: 2.4cm),
+  header: context {
+    if counter(page).get().first() > 1 [
+      #set text(size: 9pt, fill: luma(90))
+      #afangi #h(1fr) #undirtitill
+      #v(-6pt) #line(length: 100%, stroke: 0.4pt + luma(160))
+    ]
+  },
+  footer: context {
+    if counter(page).get().first() > 1 [
+      #set text(size: 9pt, fill: luma(90))
+      Rafbók – www.rafbok.is #h(1fr) #counter(page).display("1")
+    ]
+  },
+)
+
+#show heading: set text(font: ("New Computer Modern Sans", "Libertinus Sans", "DejaVu Sans"), fill: rgb("#1f4e8c"))
+#show heading.where(level: 2): it => { pagebreak(weak: true); block(above: 0.4em, below: 1em, text(size: 17pt, it.body)) }
+#show heading.where(level: 3): it => block(above: 1.6em, below: 0.8em, text(size: 13pt, it.body))
+#show heading.where(level: 4): it => block(above: 1.3em, below: 0.7em, text(size: 11.5pt, it.body))
+
+#set table(stroke: 0.5pt + luma(120), inset: (x: 6pt, y: 4pt))
+#show table.cell.where(y: 0): set text(weight: "bold")
+#show table: set align(center)
+#show figure: set block(breakable: false, above: 1.2em, below: 1.2em)
+#show figure.caption: set text(size: 9.5pt, style: "italic")
+#set list(indent: 0.8em)
+#set enum(indent: 0.8em)
+#show link: set text(fill: rgb("#2f6db5"))
+
+// ---------- Forsíða ----------
+#page(header: none, footer: none)[
+  #set align(center)
+  #v(2cm)
+  #text(size: 13pt, tracking: 2pt, fill: luma(80))[RAFBÓK]
+  #v(1.2cm)
+  #text(size: 26pt, weight: "bold", font: ("New Computer Modern Sans", "DejaVu Sans"), fill: rgb("#1f4e8c"))[#titill]
+  #v(0.4cm)
+  #text(size: 16pt)[#afangi]
+  #v(0.3cm)
+  #text(size: 18pt, style: "italic")[#undirtitill]
+  #v(1cm)
+$if(cover)$
+  #image("$cover$", width: 60%)
+$endif$
+  #v(1fr)
+  #text(size: 13pt)[#hofundur]
+  #v(0.3cm)
+  #text(size: 10pt, fill: luma(90))[#utgafa]
+  #v(1cm)
+]
+
+$if(toc)$
+#outline(title: [Efnisyfirlit], depth: 3, indent: auto)
+#pagebreak()
+$endif$
+
+$body$
